@@ -160,6 +160,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     connection = new HyDownloaderConnection{this};
     connection->setAccessKey(settings->value("accessKey").toString());
     connection->setApiUrl(settings->value("apiURL").toString());
+    connection->setCertificateVerificationEnabled(false);
     logModel = new HyDownloaderLogModel{};
     subModel = new HyDownloaderSubscriptionModel{};
     urlModel = new HyDownloaderSingleURLQueueModel{};
