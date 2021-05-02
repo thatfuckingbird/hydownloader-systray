@@ -32,14 +32,14 @@ HyDownloaderConnection::HyDownloaderConnection(QObject* parent) :
     connect(this->m_nam, &QNetworkAccessManager::sslErrors, this, &HyDownloaderConnection::sslErrors);
 }
 
-void HyDownloaderConnection::setApiUrl(const QString& url)
+void HyDownloaderConnection::setAPIURL(const QString& url)
 {
-    m_apiUrl = url;
+    m_apiURL = url;
 }
 
-QString HyDownloaderConnection::apiUrl() const
+QString HyDownloaderConnection::apiURL() const
 {
-    return m_apiUrl;
+    return m_apiURL;
 }
 
 void HyDownloaderConnection::setAccessKey(const QString& key)
@@ -111,13 +111,13 @@ uint64_t HyDownloaderConnection::requestSingleURLQueueData()
     return reply->property("requestID").toULongLong();
 }
 
-uint64_t HyDownloaderConnection::requestApiVersion()
+uint64_t HyDownloaderConnection::requestAPIVersion()
 {
     auto reply = post("/api_version", {});
     return reply->property("requestID").toULongLong();
 }
 
-uint64_t HyDownloaderConnection::deleteUrls(const QVector<int>& ids)
+uint64_t HyDownloaderConnection::deleteURLs(const QVector<int>& ids)
 {
     QJsonArray array;
     for(const auto id: ids) array.push_back(id);
@@ -135,7 +135,7 @@ uint64_t HyDownloaderConnection::deleteSubscriptions(const QVector<int>& ids)
     return post("/delete_subscriptions", QJsonDocument{obj})->property("requestID").toULongLong();
 }
 
-uint64_t HyDownloaderConnection::addOrUpdateUrls(const QJsonArray& data)
+uint64_t HyDownloaderConnection::addOrUpdateURLs(const QJsonArray& data)
 {
     return post("/add_or_update_urls", QJsonDocument{data})->property("requestID").toULongLong();
 }
@@ -186,7 +186,7 @@ void HyDownloaderConnection::shutdown()
 
 QNetworkReply* HyDownloaderConnection::get(const QString& endpoint, const QMap<QString, QString>& args)
 {
-    auto apiURL = QUrl{m_apiUrl + endpoint};
+    auto apiURL = QUrl{m_apiURL + endpoint};
 
     QUrlQuery query{apiURL};
     for(auto it = args.begin(); it != args.end(); ++it) query.addQueryItem(it.key(), it.value());
@@ -208,7 +208,7 @@ QNetworkReply* HyDownloaderConnection::setRequestID(QNetworkReply* reply)
 
 QNetworkReply* HyDownloaderConnection::post(const QString& endpoint, const QJsonDocument& body)
 {
-    auto apiURL = QUrl{m_apiUrl + endpoint};
+    auto apiURL = QUrl{m_apiURL + endpoint};
 
     QNetworkRequest req{apiURL};
     req.setSslConfiguration(m_sslConfig);
@@ -235,7 +235,7 @@ void HyDownloaderConnection::handleNetworkReplyFinished(QNetworkReply* reply)
                     emit subscriptionDataReceived(reqID, QJsonDocument::fromJson(reply->readAll()).array());
                     break;
                 case RequestType::SingleURLQueueData:
-                    emit singleUrlQueueDataReceived(reqID, QJsonDocument::fromJson(reply->readAll()).array());
+                    emit singleURLQueueDataReceived(reqID, QJsonDocument::fromJson(reply->readAll()).array());
                     break;
                 case RequestType::APIVersion:
                     emit apiVersionReceived(reqID, QJsonDocument::fromJson(reply->readAll()).object()["version"].toInt());

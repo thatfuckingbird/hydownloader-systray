@@ -25,6 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QSslError>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QShortcut>
 #include <QInputDialog>
 #include <QCloseEvent>
 #include "datetimeformatdelegate.h"
@@ -112,7 +113,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
             QJsonObject newURL;
             newURL["url"] = url;
             QJsonArray arr = {newURL};
-            connection->addOrUpdateUrls(arr);
+            connection->addOrUpdateURLs(arr);
             urlModel->refresh();
         }
     });
@@ -159,7 +160,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
 
     connection = new HyDownloaderConnection{this};
     connection->setAccessKey(settings->value("accessKey").toString());
-    connection->setApiUrl(settings->value("apiURL").toString());
+    connection->setAPIURL(settings->value("apiURL").toString());
     connection->setCertificateVerificationEnabled(false);
     logModel = new HyDownloaderLogModel{};
     subModel = new HyDownloaderSubscriptionModel{};
@@ -220,7 +221,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
 
     statusUpdateTimer = new QTimer{this};
     connect(statusUpdateTimer, &QTimer::timeout, connection, &HyDownloaderConnection::requestStatusInformation);
-    statusUpdateTimer->setInterval(5000);
+    statusUpdateTimer->setInterval(settings->value("updateInterval").toInt());
     statusUpdateTimer->start();
 
     statusUpdateIntervalTimer = new QTimer{this};
@@ -237,6 +238,103 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     ui->mainTabWidget->setCurrentIndex(0);
     ui->urlsTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->subTableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+
+    connect(ui->subTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&]{
+        int selectionSize = ui->subTableView->selectionModel()->selectedRows().size();
+        ui->recheckSubsButton->setEnabled(selectionSize > 0);
+        ui->deleteSelectedSubsButton->setEnabled(selectionSize > 0);
+        ui->viewLogForSubButton->setEnabled(selectionSize == 1);
+        ui->pauseSubsButton->setEnabled(selectionSize > 0);
+    });
+    connect(ui->urlsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&]{
+        int selectionSize = ui->urlsTableView->selectionModel()->selectedRows().size();
+        ui->pauseURLsButton->setEnabled(selectionSize > 0);
+        ui->deleteSelectedURLsButton->setEnabled(selectionSize > 0);
+        ui->viewLogForURLButton->setEnabled(selectionSize == 1);
+        ui->retryURLsButton->setEnabled(selectionSize > 0);
+    });
+    QMenu* pauseSubsMenu = new QMenu{this};
+    resumeSelectedSubsAction = pauseSubsMenu->addAction("Resume", [&]{
+        auto indices = ui->subTableView->selectionModel()->selectedRows();
+        for(auto& index: indices) {
+            index = subFilterModel->mapToSource(index);
+            auto row = subModel->getRowData(index);
+            row["paused"] = QJsonValue{0};
+            subModel->setRowData(index, row);
+        }
+    });
+    ui->pauseSubsButton->setMenu(pauseSubsMenu);
+
+    QMenu* pauseURLsMenu = new QMenu{this};
+    resumeSelectedURLsAction = pauseURLsMenu->addAction("Resume", [&]{
+        auto indices = ui->urlsTableView->selectionModel()->selectedRows();
+        for(auto& index: indices) {
+            index = urlFilterModel->mapToSource(index);
+            auto row = urlModel->getRowData(index);
+            row["paused"] = QJsonValue{0};
+            urlModel->setRowData(index, row);
+        }
+    });
+    ui->pauseURLsButton->setMenu(pauseURLsMenu);
+
+    QMenu* retryURLsMenu = new QMenu{this};
+    retryURLsMenu->addAction("Retry and force overwrite", [&]{
+        auto indices = ui->urlsTableView->selectionModel()->selectedRows();
+        for(auto& index: indices) {
+            index = urlFilterModel->mapToSource(index);
+            auto row = urlModel->getRowData(index);
+            row["status"] = QJsonValue{-1};
+            row["overwrite_existing"] = QJsonValue{1};
+            urlModel->setRowData(index, row);
+        }
+    });
+    ui->retryURLsButton->setMenu(retryURLsMenu);
+
+    [[maybe_unused]] QShortcut* deleteSubsShortcut = new QShortcut{Qt::Key_Delete, ui->subTableView, ui->deleteSelectedSubsButton, &QToolButton::click};
+    [[maybe_unused]] QShortcut* deleteURLsShortcut = new QShortcut{Qt::Key_Delete, ui->urlsTableView, ui->deleteSelectedURLsButton, &QToolButton::click};
+
+    connect(ui->subTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos){
+        int selectionSize = ui->subTableView->selectionModel()->selectedRows().size();
+        if(selectionSize == 0) return;
+
+        QMenu popup;
+        if(selectionSize == 1) {
+            popup.addAction("View log", ui->viewLogForSubButton, &QToolButton::click);
+            popup.addSeparator();
+        }
+        popup.addAction("Clear last checked time", ui->recheckSubsButton, &QToolButton::click);
+        popup.addAction("Pause", ui->pauseSubsButton, &QToolButton::click);
+        popup.addAction("Resume", resumeSelectedSubsAction, &QAction::trigger);
+        popup.addSeparator();
+        popup.addAction("Delete", ui->deleteSelectedSubsButton, &QToolButton::click);
+        popup.exec(ui->subTableView->mapToGlobal(pos));
+    });
+    ui->subTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(ui->urlsTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos){
+        int selectionSize = ui->urlsTableView->selectionModel()->selectedRows().size();
+        if(selectionSize == 0) return;
+
+        QMenu popup;
+        if(selectionSize == 1) {
+            popup.addAction("View log", ui->viewLogForURLButton, &QToolButton::click);
+            popup.addSeparator();
+        }
+        popup.addAction("Retry", ui->retryURLsButton, &QToolButton::click);
+        popup.addAction("Pause", ui->pauseURLsButton, &QToolButton::click);
+        popup.addAction("Resume", this->resumeSelectedURLsAction, &QAction::trigger);
+        popup.addSeparator();
+        popup.addAction("Delete", ui->deleteSelectedURLsButton, &QToolButton::click);
+        popup.exec(ui->urlsTableView->mapToGlobal(pos));
+    });
+    ui->urlsTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(ui->logTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos){
+        QMenu popup;
+        popup.addAction("Copy", ui->copyLogToClipboardButton, &QToolButton::clicked);
+        popup.exec(ui->logTableView->mapToGlobal(pos));
+    });
+    ui->logTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     if(settings->value("applyDarkPalette").toBool()) {
         QPalette darkPalette;
@@ -358,7 +456,7 @@ void MainWindow::on_urlsFilterLineEdit_textEdited(const QString& arg1)
     urlFilterModel->setFilterRegularExpression(arg1);
 }
 
-void MainWindow::on_viewLogUrlsButton_clicked()
+void MainWindow::on_viewLogForURLButton_clicked()
 {
     auto indices = ui->urlsTableView->selectionModel()->selectedRows();
     for(auto& index: indices) index = urlFilterModel->mapToSource(index);
@@ -380,7 +478,7 @@ void MainWindow::on_deleteSelectedURLsButton_clicked()
     auto ids = urlModel->getIDs(indices);
     if(ids.isEmpty()) return;
     if(QMessageBox::question(this, "Delete URLs", QString{"Are you sure you want to delete the %1 selected URLs?"}.arg(QString::number(ids.size()))) == QMessageBox::Yes) {
-        connection->deleteUrls(ids);
+        connection->deleteURLs(ids);
     }
 }
 
@@ -394,7 +492,7 @@ void MainWindow::on_addURLButton_clicked()
             newURL["url"] = url;
             newURL["paused"] = true;
             QJsonArray arr = {newURL};
-            connection->addOrUpdateUrls(arr);
+            connection->addOrUpdateURLs(arr);
             urlModel->refresh();
         }
     }
@@ -445,5 +543,50 @@ void MainWindow::showEvent(QShowEvent*)
         urlModel->refresh();
         subModel->refresh();
         logModel->refresh();
+    }
+}
+
+void MainWindow::on_recheckSubsButton_clicked()
+{
+    auto indices = ui->subTableView->selectionModel()->selectedRows();
+    for(auto& index: indices) {
+        index = subFilterModel->mapToSource(index);
+        auto row = subModel->getRowData(index);
+        row["last_successful_check"] = QJsonValue::Null;
+        row["last_check"] = QJsonValue::Null;
+        subModel->setRowData(index, row);
+    }
+}
+
+void MainWindow::on_pauseSubsButton_clicked()
+{
+    auto indices = ui->subTableView->selectionModel()->selectedRows();
+    for(auto& index: indices) {
+        index = subFilterModel->mapToSource(index);
+        auto row = subModel->getRowData(index);
+        row["paused"] = QJsonValue{1};
+        subModel->setRowData(index, row);
+    }
+}
+
+void MainWindow::on_retryURLsButton_clicked()
+{
+    auto indices = ui->urlsTableView->selectionModel()->selectedRows();
+    for(auto& index: indices) {
+        index = urlFilterModel->mapToSource(index);
+        auto row = urlModel->getRowData(index);
+        row["status"] = QJsonValue{-1};
+        urlModel->setRowData(index, row);
+    }
+}
+
+void MainWindow::on_pauseURLsButton_clicked()
+{
+    auto indices = ui->urlsTableView->selectionModel()->selectedRows();
+    for(auto& index: indices) {
+        index = urlFilterModel->mapToSource(index);
+        auto row = urlModel->getRowData(index);
+        row["paused"] = QJsonValue{1};
+        urlModel->setRowData(index, row);
     }
 }

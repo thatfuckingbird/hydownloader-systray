@@ -42,13 +42,13 @@ HyDownloaderSingleURLQueueModel::HyDownloaderSingleURLQueueModel() :
 
 void HyDownloaderSingleURLQueueModel::setUpConnections(HyDownloaderConnection* oldConnection)
 {
-    if(oldConnection) disconnect(oldConnection, &HyDownloaderConnection::singleUrlQueueDataReceived, this, &HyDownloaderSingleURLQueueModel::handleSingleURLQueueData);
-    connect(m_connection, &HyDownloaderConnection::singleUrlQueueDataReceived, this, &HyDownloaderSingleURLQueueModel::handleSingleURLQueueData);
+    if(oldConnection) disconnect(oldConnection, &HyDownloaderConnection::singleURLQueueDataReceived, this, &HyDownloaderSingleURLQueueModel::handleSingleURLQueueData);
+    connect(m_connection, &HyDownloaderConnection::singleURLQueueDataReceived, this, &HyDownloaderSingleURLQueueModel::handleSingleURLQueueData);
 }
 
 std::uint64_t HyDownloaderSingleURLQueueModel::addOrUpdateObject(const QJsonObject& obj)
 {
-    return m_connection->addOrUpdateUrls({obj});
+    return m_connection->addOrUpdateURLs({obj});
 }
 
 void HyDownloaderSingleURLQueueModel::refresh()

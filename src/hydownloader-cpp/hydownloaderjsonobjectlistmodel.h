@@ -44,6 +44,19 @@ public:
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     Qt::ItemFlags flags(const QModelIndex& index) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QJsonObject getRowData(const QModelIndex& rowIndex) const;
+    void setRowData(const QModelIndex& rowIndex, const QJsonObject& obj);
+
+private:
+    QSet<std::uint64_t> m_updateIDs;
+
+private slots:
+    void handleReplyReceived(std::uint64_t requestID, const QJsonObject&);
+
+protected:
+    const ColumnData m_columnData;
+    QJsonArray m_data;
+    HyDownloaderConnection* m_connection = nullptr;
     static constexpr auto toVariant = [](const QJsonValue& val) {
         return val.toVariant();
     };
@@ -59,15 +72,4 @@ public:
     static constexpr auto fromDateTime = [](const QVariant& val) {
         return !val.isValid() || val.isNull() ? QJsonValue::fromVariant(val) : static_cast<double>(val.toDateTime().toMSecsSinceEpoch()) / 1000;
     };
-
-private:
-    QSet<std::uint64_t> m_updateIDs;
-
-private slots:
-    void handleReplyReceived(std::uint64_t requestID, const QJsonObject&);
-
-protected:
-    const ColumnData m_columnData;
-    QJsonArray m_data;
-    HyDownloaderConnection* m_connection = nullptr;
 };

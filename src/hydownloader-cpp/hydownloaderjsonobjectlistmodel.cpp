@@ -102,6 +102,18 @@ QVariant HyDownloaderJSONObjectListModel::headerData(int section, Qt::Orientatio
     return std::get<1>(m_columnData[section]);
 }
 
+QJsonObject HyDownloaderJSONObjectListModel::getRowData(const QModelIndex& rowIndex) const
+{
+    return m_data[rowIndex.row()].toObject();
+}
+
+void HyDownloaderJSONObjectListModel::setRowData(const QModelIndex& rowIndex, const QJsonObject &obj)
+{
+    m_data[rowIndex.row()] = obj;
+    m_updateIDs.insert(addOrUpdateObject(obj));
+    emit dataChanged(createIndex(rowIndex.row(), 0), createIndex(rowIndex.row(), m_columnData.size()-1));
+}
+
 void HyDownloaderJSONObjectListModel::handleReplyReceived(uint64_t requestID, const QJsonObject&)
 {
     if(m_updateIDs.contains(requestID)) {

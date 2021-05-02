@@ -58,13 +58,17 @@ private slots:
     void on_deleteSelectedSubsButton_clicked();
     void on_addSubButton_clicked();
     void on_urlsFilterLineEdit_textEdited(const QString& arg1);
-    void on_viewLogUrlsButton_clicked();
+    void on_viewLogForURLButton_clicked();
     void on_refreshURLsButton_clicked();
     void on_deleteSelectedURLsButton_clicked();
     void on_addURLButton_clicked();
     void setStatusText(const QString& text);
     Qt::GlobalColor statusToColor(const QString& statusText);
     Qt::GlobalColor queueSizeToColor(int size);
+    void on_recheckSubsButton_clicked();
+    void on_pauseSubsButton_clicked();
+    void on_retryURLsButton_clicked();
+    void on_pauseURLsButton_clicked();
 
 private:
     Ui::MainWindow* ui = nullptr;
@@ -85,6 +89,8 @@ private:
     QTimer* statusUpdateTimer = nullptr;
     QTimer* statusUpdateIntervalTimer = nullptr;
     QTime lastUpdateTime;
+    QAction* resumeSelectedURLsAction = nullptr;
+    QAction* resumeSelectedSubsAction = nullptr;
     HyDownloaderConnection* connection = nullptr;
     HyDownloaderLogModel* logModel = nullptr;
     HyDownloaderSingleURLQueueModel* urlModel = nullptr;

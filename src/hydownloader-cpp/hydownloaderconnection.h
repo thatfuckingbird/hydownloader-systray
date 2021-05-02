@@ -41,8 +41,8 @@ public:
     Q_ENUM(RequestType)
 
 public slots:
-    void setApiUrl(const QString& url);
-    QString apiUrl() const;
+    void setAPIURL(const QString& url);
+    QString apiURL() const;
     void setAccessKey(const QString& key);
     QString accessKey() const;
     void setStrictTransportSecurityEnabled(bool enabled);
@@ -55,10 +55,10 @@ public slots:
     std::uint64_t requestStatusInformation();
     std::uint64_t requestSubscriptionData();
     std::uint64_t requestSingleURLQueueData();
-    std::uint64_t requestApiVersion();
-    std::uint64_t deleteUrls(const QVector<int>& ids);
+    std::uint64_t requestAPIVersion();
+    std::uint64_t deleteURLs(const QVector<int>& ids);
     std::uint64_t deleteSubscriptions(const QVector<int>& ids);
-    std::uint64_t addOrUpdateUrls(const QJsonArray& data);
+    std::uint64_t addOrUpdateURLs(const QJsonArray& data);
     std::uint64_t addOrUpdateSubscriptions(const QJsonArray& data);
     std::uint64_t pauseSubscriptions();
     std::uint64_t resumeSubscriptions();
@@ -74,7 +74,7 @@ signals:
     void staticDataReceived(std::uint64_t requestID, const QByteArray& data);
     void statusInformationReceived(std::uint64_t requestID, const QJsonObject& info);
     void subscriptionDataReceived(std::uint64_t requestID, const QJsonArray& data);
-    void singleUrlQueueDataReceived(std::uint64_t requestID, const QJsonArray& data);
+    void singleURLQueueDataReceived(std::uint64_t requestID, const QJsonArray& data);
     void apiVersionReceived(std::uint64_t requestID, int version);
     void replyReceived(std::uint64_t requestID, const QJsonObject& data);
 
@@ -86,7 +86,7 @@ private slots:
 private:
     QNetworkAccessManager* m_nam = nullptr;
     QSslConfiguration m_sslConfig;
-    QString m_apiUrl;
+    QString m_apiURL;
     QString m_accessKey;
     std::atomic_uint64_t m_requestIDCounter = 0;
     QNetworkReply* setRequestID(QNetworkReply* reply);
