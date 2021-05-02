@@ -1,5 +1,5 @@
 pkgname=hydownloader-systray-git
-pkgver=1.0.0
+pkgver=r8.29b02b2
 pkgrel=1
 pkgdesc="Remote management GUI for hydownloader."
 arch=('i686' 'x86_64')
@@ -9,6 +9,11 @@ makedepends=('cmake' 'qt6-tools' 'qt6-base')
 provides=('hydownloader-systray')
 source=("$pkgname"::"git+https://github.com/thatfuckingbird/hydownloader-systray.git")
 sha512sums=('SKIP')
+
+pkgver() {
+  cd "$srcdir/$pkgname"
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
 
 build() {
   cd "$srcdir/$pkgname"
