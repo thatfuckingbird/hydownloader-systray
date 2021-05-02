@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
+#include <QTextStream>
 #include <cstdlib>
 
 int main(int argc, char* argv[])
@@ -33,7 +34,12 @@ int main(int argc, char* argv[])
     p.process(a);
 
     QString filename = p.value(opt);
-    if(!QFile::exists(filename)) return EXIT_FAILURE;
+    if(!QFile::exists(filename))
+    {
+        QTextStream out(stderr);
+        out << "Invalid or missing configuration file!";
+        return EXIT_FAILURE;
+    }
 
     MainWindow w{filename};
     return a.exec();
