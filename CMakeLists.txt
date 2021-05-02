@@ -36,3 +36,6 @@ add_library(hydownloader
 target_include_directories(hydownloader-systray PRIVATE src/hydownloader-cpp)
 target_link_libraries(hydownloader PRIVATE Qt6::Core Qt6::Network Qt6::Gui)
 target_link_libraries(hydownloader-systray PRIVATE Qt6::Widgets Qt6::Network hydownloader)
+
+install(TARGETS hydownloader LIBRARY DESTINATION lib)
+install(TARGETS hydownloader-systray RUNTIME DESTINATION bin)
