@@ -239,27 +239,26 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
 
     if(settings->value("applyDarkPalette").toBool()) {
         QPalette darkPalette;
-
-        darkPalette.setColor(QPalette::Window, QColor("#474747"));
-        darkPalette.setColor(QPalette::WindowText, QColor("#aeaeae"));
-        darkPalette.setColor(QPalette::Base, QColor("#404040"));
-        darkPalette.setColor(QPalette::AlternateBase, QColor("#303030"));
-        darkPalette.setColor(QPalette::ToolTipBase, QColor("#474747"));
-        darkPalette.setColor(QPalette::ToolTipText, QColor("#aeaeae"));
-        darkPalette.setColor(QPalette::Text, QColor("#aeaeae"));
-        darkPalette.setColor(QPalette::Button, QColor("#474747"));
-        darkPalette.setColor(QPalette::ButtonText, QColor("#aeaeae"));
-        darkPalette.setColor(QPalette::BrightText, QColor("#eeeeee"));
-        darkPalette.setColor(QPalette::Link, QColor("#a7c5f9"));
-        darkPalette.setColor(QPalette::LinkVisited, QColor("#cbb4f9"));
-        darkPalette.setColor(QPalette::Highlight, QColor("#53728e"));
-        darkPalette.setColor(QPalette::HighlightedText, QColor("#aeaeae"));
-        darkPalette.setColor(QPalette::PlaceholderText, QColor("#aaaaaa"));
-        darkPalette.setColor(QPalette::Light, QColor("#676767"));
-        darkPalette.setColor(QPalette::Midlight, QColor("#575757"));
-        darkPalette.setColor(QPalette::Dark, QColor("#303030"));
-        darkPalette.setColor(QPalette::Mid, QColor("#404040"));
-        darkPalette.setColor(QPalette::Shadow, QColor("#111111"));
+        darkPalette.setColor(QPalette::Window, QColor(0x47, 0x47, 0x47));
+        darkPalette.setColor(QPalette::WindowText, QColor(0xae, 0xae, 0xae));
+        darkPalette.setColor(QPalette::Base, QColor(0x40, 0x40, 0x40));
+        darkPalette.setColor(QPalette::AlternateBase, QColor(0x30, 0x30, 0x30));
+        darkPalette.setColor(QPalette::ToolTipBase, QColor(0x47, 0x47, 0x47));
+        darkPalette.setColor(QPalette::ToolTipText, QColor(0xae, 0xae, 0xae));
+        darkPalette.setColor(QPalette::Text, QColor(0xae, 0xae, 0xae));
+        darkPalette.setColor(QPalette::Button, QColor(0x47, 0x47, 0x47));
+        darkPalette.setColor(QPalette::ButtonText, QColor(0xae, 0xae, 0xae));
+        darkPalette.setColor(QPalette::BrightText, QColor(0xee, 0xee, 0xee));
+        darkPalette.setColor(QPalette::Link, QColor(0xa7, 0xc5, 0xf9));
+        darkPalette.setColor(QPalette::LinkVisited, QColor(0xcb, 0xb4, 0xf9));
+        darkPalette.setColor(QPalette::Highlight, QColor(0x53, 0x72, 0x8e));
+        darkPalette.setColor(QPalette::HighlightedText, QColor(0xae, 0xae, 0xae));
+        darkPalette.setColor(QPalette::PlaceholderText, QColor(0xaa, 0xaa, 0xaa));
+        darkPalette.setColor(QPalette::Light, QColor(0x67, 0x67, 0x67));
+        darkPalette.setColor(QPalette::Midlight, QColor(0x57, 0x57, 0x57));
+        darkPalette.setColor(QPalette::Dark, QColor(0x30, 0x30, 0x30));
+        darkPalette.setColor(QPalette::Mid, QColor(0x40, 0x40, 0x40));
+        darkPalette.setColor(QPalette::Shadow, QColor(0x11, 0x11, 0x11));
 
         qApp->setPalette(darkPalette);
     }
