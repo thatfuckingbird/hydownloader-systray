@@ -25,7 +25,7 @@ QString DateTimeFormatDelegate::displayText(const QVariant& value, const QLocale
 {
     switch(value.userType()) {
         case QMetaType::Type::QDateTime:
-            return locale.toString(value.toDateTime(), "yyyy-MM-dd HH:MM:ss");
+            return locale.toString(value.toDateTime(), "yyyy-MM-dd hh:mm:ss");
         default:
             return QStyledItemDelegate::displayText(value, locale);
     }
@@ -35,6 +35,6 @@ QWidget* DateTimeFormatDelegate::createEditor(QWidget* parent, const QStyleOptio
 {
     QWidget* widget = QStyledItemDelegate::createEditor(parent, option, index);
     if(strcmp(widget->metaObject()->className(), "QDateTimeEdit") == 0)
-        dynamic_cast<QDateTimeEdit*>(widget)->setDisplayFormat("yyyy-MM-dd HH:MM:ss");
+        dynamic_cast<QDateTimeEdit*>(widget)->setDisplayFormat("yyyy-MM-dd hh:mm:ss");
     return widget;
 }

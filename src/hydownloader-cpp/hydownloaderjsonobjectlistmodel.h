@@ -64,12 +64,12 @@ protected:
         return static_cast<bool>(val.toInt());
     };
     static constexpr auto toDateTime = [](const QJsonValue& val) {
-        return val.isNull() || val.isUndefined() ? QVariant{} : QDateTime::fromMSecsSinceEpoch(val.toDouble() * 1000);
+        return val.isNull() || val.isUndefined() ? QVariant{} : QDateTime::fromSecsSinceEpoch(val.toDouble());
     };
     static constexpr auto fromBool = [](const QVariant& val) {
         return static_cast<int>(val.toBool());
     };
     static constexpr auto fromDateTime = [](const QVariant& val) {
-        return !val.isValid() || val.isNull() ? QJsonValue::fromVariant(val) : static_cast<double>(val.toDateTime().toMSecsSinceEpoch()) / 1000;
+        return !val.isValid() || val.isNull() ? QJsonValue::fromVariant(val) : static_cast<double>(val.toDateTime().toSecsSinceEpoch());
     };
 };
