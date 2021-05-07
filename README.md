@@ -25,7 +25,6 @@ Customize the `settings.ini` found in this repo, then launch with `hydownloader-
 ## TODO
 
 * Color the rows of the log view according to severity
-* Fix ffmpeg output leaking into the additional_data database table
 * Add icon and desktop file
 
 ## License
