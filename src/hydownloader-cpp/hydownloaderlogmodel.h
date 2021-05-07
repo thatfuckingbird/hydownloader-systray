@@ -27,6 +27,7 @@ class HyDownloaderConnection;
 class HyDownloaderLogModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QString statusText READ statusText NOTIFY statusTextChanged)
 
 public:
     enum class LogLevel {
@@ -53,6 +54,11 @@ public:
     QVariant data(const QModelIndex& index, int role) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+    Q_SCRIPTABLE QString statusText() const;
+
+signals:
+    void statusTextChanged(const QString&);
+
 private slots:
     void handleStaticData(std::uint64_t requestID, const QByteArray& data);
     void handleNetworkError(std::uint64_t requestID, int status, QNetworkReply::NetworkError, const QString&);
@@ -71,5 +77,6 @@ private:
     QStringList m_rawLines;
     QVector<LogLevel> m_logLevels;
     HyDownloaderConnection* m_connection = nullptr;
+    QString m_statusText;
     std::pair<QString, LogLevel> processLine(const QString& line);
 };

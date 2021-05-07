@@ -107,11 +107,11 @@ QJsonObject HyDownloaderJSONObjectListModel::getRowData(const QModelIndex& rowIn
     return m_data[rowIndex.row()].toObject();
 }
 
-void HyDownloaderJSONObjectListModel::setRowData(const QModelIndex& rowIndex, const QJsonObject &obj)
+void HyDownloaderJSONObjectListModel::setRowData(const QModelIndex& rowIndex, const QJsonObject& obj)
 {
     m_data[rowIndex.row()] = obj;
     m_updateIDs.insert(addOrUpdateObject(obj));
-    emit dataChanged(createIndex(rowIndex.row(), 0), createIndex(rowIndex.row(), m_columnData.size()-1));
+    emit dataChanged(createIndex(rowIndex.row(), 0), createIndex(rowIndex.row(), m_columnData.size() - 1));
 }
 
 void HyDownloaderJSONObjectListModel::handleReplyReceived(uint64_t requestID, const QJsonObject&)

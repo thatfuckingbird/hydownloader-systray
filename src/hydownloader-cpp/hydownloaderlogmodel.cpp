@@ -21,7 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QGuiApplication>
 #include <QClipboard>
 
-HyDownloaderLogModel::HyDownloaderLogModel()
+HyDownloaderLogModel::HyDownloaderLogModel() :
+    m_statusText{"No log loaded"}
 {
 }
 
@@ -34,6 +35,7 @@ void HyDownloaderLogModel::setConnection(HyDownloaderConnection* connection)
     m_connection = connection;
     connect(m_connection, &HyDownloaderConnection::staticDataReceived, this, &HyDownloaderLogModel::handleStaticData);
     connect(m_connection, &HyDownloaderConnection::networkError, this, &HyDownloaderLogModel::handleNetworkError);
+    emit statusTextChanged(m_statusText);
 }
 
 void HyDownloaderLogModel::loadSubscriptionLog(int id, bool unsupportedURLs)
@@ -47,6 +49,9 @@ void HyDownloaderLogModel::loadSubscriptionLog(int id, bool unsupportedURLs)
 
     m_lastLoadedLog = LogType::SubscriptionLog;
     m_lastLoadedLogParams = {id, unsupportedURLs};
+
+    m_statusText = QString{"Loading log for subscription %1..."}.arg(id);
+    emit statusTextChanged(m_statusText);
 }
 
 void HyDownloaderLogModel::loadDaemonLog()
@@ -58,6 +63,9 @@ void HyDownloaderLogModel::loadDaemonLog()
 
     m_lastLoadedLog = LogType::DaemonLog;
     m_lastLoadedLogParams.clear();
+
+    m_statusText = "Loading daemon log...";
+    emit statusTextChanged(m_statusText);
 }
 
 void HyDownloaderLogModel::loadSingleURLQueueLog(int id, bool unsupportedURLs)
@@ -71,6 +79,9 @@ void HyDownloaderLogModel::loadSingleURLQueueLog(int id, bool unsupportedURLs)
 
     m_lastLoadedLog = LogType::SingleURLQueueLog;
     m_lastLoadedLogParams = {id, unsupportedURLs};
+
+    m_statusText = QString{"Loading log for URL %1..."}.arg(id);
+    emit statusTextChanged(m_statusText);
 }
 
 void HyDownloaderLogModel::clear()
@@ -83,6 +94,9 @@ void HyDownloaderLogModel::clear()
     m_lastLoadedLog = LogType::NoLog;
     m_lastLoadedLogParams.clear();
     endResetModel();
+
+    m_statusText = "No log loaded";
+    emit statusTextChanged(m_statusText);
 }
 
 void HyDownloaderLogModel::copyToClipboard(const QModelIndexList& indices)
@@ -168,6 +182,11 @@ QVariant HyDownloaderLogModel::headerData(int section, Qt::Orientation orientati
     }
 }
 
+QString HyDownloaderLogModel::statusText() const
+{
+    return m_statusText;
+}
+
 void HyDownloaderLogModel::handleStaticData(uint64_t requestID, const QByteArray& data)
 {
     bool allDataReceived = true;
@@ -200,6 +219,23 @@ void HyDownloaderLogModel::handleStaticData(uint64_t requestID, const QByteArray
     }
     endInsertRows();
     m_receivedData.clear();
+
+    switch(m_lastLoadedLog) {
+        case LogType::NoLog:
+            m_statusText = "No log loaded";
+            break;
+        case LogType::SubscriptionLog:
+            m_statusText = QString{"Log for subscription %1"}.arg(m_lastLoadedLogParams[0].toInt());
+            break;
+        case LogType::DaemonLog:
+            m_statusText = "Daemon log";
+            break;
+        case LogType::SingleURLQueueLog:
+            m_statusText = QString{"Log for URL %1"}.arg(m_lastLoadedLogParams[0].toInt());
+            break;
+    }
+
+    emit statusTextChanged(m_statusText);
 }
 
 void HyDownloaderLogModel::handleNetworkError(uint64_t requestID, int status, QNetworkReply::NetworkError, const QString&)

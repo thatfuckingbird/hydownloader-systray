@@ -187,6 +187,10 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     ui->subTableView->setModel(subFilterModel);
     ui->subTableView->setItemDelegate(new DateTimeFormatDelegate{});
 
+    connect(logModel, &HyDownloaderLogModel::statusTextChanged, [&](const QString& statusText){
+        ui->currentLogLabel->setText(statusText);
+    });
+
     logModel->setConnection(connection);
     subModel->setConnection(connection);
     urlModel->setConnection(connection);
