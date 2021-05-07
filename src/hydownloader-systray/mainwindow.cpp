@@ -243,14 +243,14 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     ui->urlsTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->subTableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
 
-    connect(ui->subTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&]{
+    connect(ui->subTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&] {
         int selectionSize = ui->subTableView->selectionModel()->selectedRows().size();
         ui->recheckSubsButton->setEnabled(selectionSize > 0);
         ui->deleteSelectedSubsButton->setEnabled(selectionSize > 0);
         ui->viewLogForSubButton->setEnabled(selectionSize == 1);
         ui->pauseSubsButton->setEnabled(selectionSize > 0);
     });
-    connect(ui->urlsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&]{
+    connect(ui->urlsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&] {
         int selectionSize = ui->urlsTableView->selectionModel()->selectedRows().size();
         ui->pauseURLsButton->setEnabled(selectionSize > 0);
         ui->deleteSelectedURLsButton->setEnabled(selectionSize > 0);
@@ -258,7 +258,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
         ui->retryURLsButton->setEnabled(selectionSize > 0);
     });
     QMenu* pauseSubsMenu = new QMenu{this};
-    resumeSelectedSubsAction = pauseSubsMenu->addAction("Resume", [&]{
+    resumeSelectedSubsAction = pauseSubsMenu->addAction("Resume", [&] {
         auto indices = ui->subTableView->selectionModel()->selectedRows();
         for(auto& index: indices) {
             index = subFilterModel->mapToSource(index);
@@ -270,7 +270,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     ui->pauseSubsButton->setMenu(pauseSubsMenu);
 
     QMenu* pauseURLsMenu = new QMenu{this};
-    resumeSelectedURLsAction = pauseURLsMenu->addAction("Resume", [&]{
+    resumeSelectedURLsAction = pauseURLsMenu->addAction("Resume", [&] {
         auto indices = ui->urlsTableView->selectionModel()->selectedRows();
         for(auto& index: indices) {
             index = urlFilterModel->mapToSource(index);
@@ -282,7 +282,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     ui->pauseURLsButton->setMenu(pauseURLsMenu);
 
     QMenu* retryURLsMenu = new QMenu{this};
-    retryURLsMenu->addAction("Retry and force overwrite", [&]{
+    retryURLsMenu->addAction("Retry and force overwrite", [&] {
         auto indices = ui->urlsTableView->selectionModel()->selectedRows();
         for(auto& index: indices) {
             index = urlFilterModel->mapToSource(index);
@@ -297,7 +297,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     [[maybe_unused]] QShortcut* deleteSubsShortcut = new QShortcut{Qt::Key_Delete, ui->subTableView, ui->deleteSelectedSubsButton, &QToolButton::click};
     [[maybe_unused]] QShortcut* deleteURLsShortcut = new QShortcut{Qt::Key_Delete, ui->urlsTableView, ui->deleteSelectedURLsButton, &QToolButton::click};
 
-    connect(ui->subTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos){
+    connect(ui->subTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos) {
         int selectionSize = ui->subTableView->selectionModel()->selectedRows().size();
         if(selectionSize == 0) return;
 
@@ -315,7 +315,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     });
     ui->subTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    connect(ui->urlsTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos){
+    connect(ui->urlsTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos) {
         int selectionSize = ui->urlsTableView->selectionModel()->selectedRows().size();
         if(selectionSize == 0) return;
 
@@ -333,7 +333,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     });
     ui->urlsTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    connect(ui->logTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos){
+    connect(ui->logTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos) {
         QMenu popup;
         popup.addAction("Copy", ui->copyLogToClipboardButton, &QToolButton::clicked);
         popup.exec(ui->logTableView->mapToGlobal(pos));

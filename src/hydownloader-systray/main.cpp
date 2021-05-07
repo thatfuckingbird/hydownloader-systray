@@ -34,8 +34,7 @@ int main(int argc, char* argv[])
     p.process(a);
 
     QString filename = p.value(opt);
-    if(!QFile::exists(filename))
-    {
+    if(!QFile::exists(filename)) {
         QTextStream out(stderr);
         out << "Invalid or missing configuration file!";
         return EXIT_FAILURE;
