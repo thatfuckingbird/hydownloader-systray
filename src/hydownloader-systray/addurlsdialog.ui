@@ -32,6 +32,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QLineEdit" name="additionalDataLineEdit">
+     <property name="placeholderText">
+      <string>additional tags or data</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QCheckBox" name="startPausedCheckBox">
      <property name="text">
       <string>Start paused</string>

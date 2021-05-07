@@ -549,6 +549,10 @@ void MainWindow::launchAddURLsDialog(bool paused)
             QJsonObject newURL;
             newURL["url"] = url;
             newURL["paused"] = diag.startPaused();
+            if(const auto& additionalData = diag.additionalData(); additionalData.size())
+            {
+                newURL["additional_data"] = additionalData;
+            }
             arr.append(newURL);
         }
         if(arr.size()) {

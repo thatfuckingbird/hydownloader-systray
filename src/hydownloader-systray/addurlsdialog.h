@@ -16,6 +16,7 @@ public:
     QStringList getURLs() const;
     bool startPaused() const;
     void setStartPaused(bool paused);
+    QString additionalData() const;
     ~AddURLsDialog();
 
 private:

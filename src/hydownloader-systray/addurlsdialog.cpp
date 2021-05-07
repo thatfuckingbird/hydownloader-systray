@@ -28,6 +28,11 @@ void AddURLsDialog::setStartPaused(bool paused)
     ui->startPausedCheckBox->setChecked(paused);
 }
 
+QString AddURLsDialog::additionalData() const
+{
+    return ui->additionalDataLineEdit->text().trimmed();
+}
+
 AddURLsDialog::~AddURLsDialog()
 {
     delete ui;
