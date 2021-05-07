@@ -19,7 +19,10 @@ qt_add_executable(hydownloader-systray
     src/hydownloader-systray/mainwindow.h
     src/hydownloader-systray/datetimeformatdelegate.cpp
     src/hydownloader-systray/datetimeformatdelegate.h
-    src/hydownloader-systray/mainwindow.ui)
+    src/hydownloader-systray/mainwindow.ui
+    src/hydownloader-systray/addurlsdialog.cpp
+    src/hydownloader-systray/addurlsdialog.h
+    src/hydownloader-systray/addurlsdialog.ui)
 
 add_library(hydownloader
     src/hydownloader-cpp/hydownloaderconnection.h

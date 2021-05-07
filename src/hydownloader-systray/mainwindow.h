@@ -74,7 +74,6 @@ private slots:
     void on_loadSubChecksForSubButton_clicked();
     void on_refreshSubChecksButton_clicked();
     void on_subCheckFilterLineEdit_textEdited(const QString& arg1);
-
     void on_viewChecksForSubButton_clicked();
 
 private:
@@ -109,6 +108,7 @@ private:
     QSortFilterProxyModel* subFilterModel = nullptr;
     QSortFilterProxyModel* subCheckFilterModel = nullptr;
     void setIcon(const QIcon& icon);
+    void launchAddURLsDialog(bool paused);
 
 protected:
     void closeEvent(QCloseEvent* event) override;

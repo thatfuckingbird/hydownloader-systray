@@ -36,6 +36,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "hydownloadersubscriptionchecksmodel.h"
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "addurlsdialog.h"
 
 QPixmap drawSystrayIcon(const QVector<Qt::GlobalColor>& data)
 {
@@ -108,15 +109,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     QMenu* trayMenu = new QMenu{this};
     downloadURLAction = trayMenu->addAction("Download URL");
     connect(downloadURLAction, &QAction::triggered, [&] {
-        bool ok = true;
-        QString url = QInputDialog::getText(this, "Download URL", "URL:", QLineEdit::Normal, {}, &ok);
-        if(ok && !url.isEmpty()) {
-            QJsonObject newURL;
-            newURL["url"] = url;
-            QJsonArray arr = {newURL};
-            connection->addOrUpdateURLs(arr);
-            urlModel->refresh();
-        }
+        launchAddURLsDialog(false);
     });
 
     trayMenu->addSeparator();
@@ -510,18 +503,7 @@ void MainWindow::on_deleteSelectedURLsButton_clicked()
 
 void MainWindow::on_addURLButton_clicked()
 {
-    bool ok = true;
-    QString url = QInputDialog::getText(this, "Download URL", "URL:", QLineEdit::Normal, {}, &ok);
-    if(ok && !url.isEmpty()) {
-        if(ok && !url.isEmpty()) {
-            QJsonObject newURL;
-            newURL["url"] = url;
-            newURL["paused"] = true;
-            QJsonArray arr = {newURL};
-            connection->addOrUpdateURLs(arr);
-            urlModel->refresh();
-        }
-    }
+    launchAddURLsDialog(true);
 }
 
 void MainWindow::setStatusText(const QString& text)
@@ -555,6 +537,25 @@ void MainWindow::setIcon(const QIcon& icon)
 {
     trayIcon->setIcon(icon);
     setWindowIcon(icon);
+}
+
+void MainWindow::launchAddURLsDialog(bool paused)
+{
+    AddURLsDialog diag{this};
+    diag.setStartPaused(paused);
+    if(diag.exec()) {
+        QJsonArray arr;
+        for(const auto& url: diag.getURLs()) {
+            QJsonObject newURL;
+            newURL["url"] = url;
+            newURL["paused"] = diag.startPaused();
+            arr.append(newURL);
+        }
+        if(arr.size()) {
+            connection->addOrUpdateURLs(arr);
+            urlModel->refresh();
+        }
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
