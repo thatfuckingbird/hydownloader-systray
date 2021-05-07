@@ -35,6 +35,7 @@ public:
         StaticData,
         StatusInformation,
         SubscriptionData,
+        SubscriptionChecksData,
         SingleURLQueueData,
         APIVersion
     };
@@ -54,6 +55,7 @@ public slots:
     std::uint64_t requestStaticData(QString filePath);
     std::uint64_t requestStatusInformation();
     std::uint64_t requestSubscriptionData();
+    std::uint64_t requestSubscriptionChecksData(int subscription_id = 0);
     std::uint64_t requestSingleURLQueueData();
     std::uint64_t requestAPIVersion();
     std::uint64_t deleteURLs(const QVector<int>& ids);
@@ -75,6 +77,7 @@ signals:
     void statusInformationReceived(std::uint64_t requestID, const QJsonObject& info);
     void subscriptionDataReceived(std::uint64_t requestID, const QJsonArray& data);
     void singleURLQueueDataReceived(std::uint64_t requestID, const QJsonArray& data);
+    void subscriptionChecksDataReceived(std::uint64_t requestID, const QJsonArray& data);
     void apiVersionReceived(std::uint64_t requestID, int version);
     void replyReceived(std::uint64_t requestID, const QJsonObject& data);
 

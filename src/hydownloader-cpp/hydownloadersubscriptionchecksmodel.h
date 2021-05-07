@@ -22,16 +22,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 class HyDownloaderConnection;
 
-class HyDownloaderSingleURLQueueModel : public HyDownloaderJSONObjectListModel
+class HyDownloaderSubscriptionChecksModel : public HyDownloaderJSONObjectListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QString statusText READ statusText NOTIFY statusTextChanged)
 
 public:
-    HyDownloaderSingleURLQueueModel();
+    HyDownloaderSubscriptionChecksModel();
     void setUpConnections(HyDownloaderConnection* oldConnection) override;
     std::uint64_t addOrUpdateObject(const QJsonObject& obj) override;
     void refresh() override;
+    void clear() override;
+
+public slots:
+    void loadDataForSubscription(int subscriptionID);
+    QString statusText() const;
+
+signals:
+    void statusTextChanged(const QString&);
 
 private slots:
-    void handleSingleURLQueueData(std::uint64_t requestID, const QJsonArray& data);
+    void handleSubscriptionChecksData(std::uint64_t requestID, const QJsonArray& data);
+
+private:
+    int m_lastRequestedID = 0;
+    QString m_statusText;
 };

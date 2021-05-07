@@ -33,6 +33,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "hydownloaderlogmodel.h"
 #include "hydownloadersubscriptionmodel.h"
 #include "hydownloadersingleurlqueuemodel.h"
+#include "hydownloadersubscriptionchecksmodel.h"
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
@@ -133,7 +134,14 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
         show();
         raise();
     });
-    logsAction = trayMenu->addAction("View logs");
+    checksAction = trayMenu->addAction("Review subscription checks");
+    connect(checksAction, &QAction::triggered, [&] {
+        ui->mainTabWidget->setCurrentWidget(ui->subChecksTab);
+        subCheckModel->refresh();
+        show();
+        raise();
+    });
+    logsAction = trayMenu->addAction("Review logs");
     connect(logsAction, &QAction::triggered, [&] {
         ui->mainTabWidget->setCurrentWidget(ui->logsTab);
         logModel->refresh();
@@ -164,6 +172,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     connection->setCertificateVerificationEnabled(false);
     logModel = new HyDownloaderLogModel{};
     subModel = new HyDownloaderSubscriptionModel{};
+    subCheckModel = new HyDownloaderSubscriptionChecksModel{};
     urlModel = new HyDownloaderSingleURLQueueModel{};
 
     logFilterModel = new QSortFilterProxyModel{};
@@ -187,12 +196,23 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
     ui->subTableView->setModel(subFilterModel);
     ui->subTableView->setItemDelegate(new DateTimeFormatDelegate{});
 
-    connect(logModel, &HyDownloaderLogModel::statusTextChanged, [&](const QString& statusText){
+    subCheckFilterModel = new QSortFilterProxyModel{};
+    subCheckFilterModel->setSourceModel(subCheckModel);
+    subCheckFilterModel->setFilterKeyColumn(-1);
+    ui->subCheckTableView->setModel(subCheckFilterModel);
+    ui->subCheckTableView->setItemDelegate(new DateTimeFormatDelegate{});
+
+    connect(logModel, &HyDownloaderLogModel::statusTextChanged, [&](const QString& statusText) {
         ui->currentLogLabel->setText(statusText);
+    });
+
+    connect(subCheckModel, &HyDownloaderSubscriptionChecksModel::statusTextChanged, [&](const QString& statusText) {
+        ui->currentSubChecksLabel->setText(statusText);
     });
 
     logModel->setConnection(connection);
     subModel->setConnection(connection);
+    subCheckModel->setConnection(connection);
     urlModel->setConnection(connection);
 
     connect(connection, &HyDownloaderConnection::networkError, [&](std::uint64_t, int status, QNetworkReply::NetworkError, const QString& errorText) {
@@ -248,6 +268,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
         ui->recheckSubsButton->setEnabled(selectionSize > 0);
         ui->deleteSelectedSubsButton->setEnabled(selectionSize > 0);
         ui->viewLogForSubButton->setEnabled(selectionSize == 1);
+        ui->viewChecksForSubButton->setEnabled(selectionSize == 1);
         ui->pauseSubsButton->setEnabled(selectionSize > 0);
     });
     connect(ui->urlsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&] {
@@ -304,6 +325,7 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
         QMenu popup;
         if(selectionSize == 1) {
             popup.addAction("View log", ui->viewLogForSubButton, &QToolButton::click);
+            popup.addAction("View check history", ui->viewChecksForSubButton, &QToolButton::click);
             popup.addSeparator();
         }
         popup.addAction("Clear last checked time", ui->recheckSubsButton, &QToolButton::click);
@@ -593,4 +615,35 @@ void MainWindow::on_pauseURLsButton_clicked()
         row["paused"] = QJsonValue{1};
         urlModel->setRowData(index, row);
     }
+}
+
+void MainWindow::on_loadSubChecksForAllButton_clicked()
+{
+    subCheckModel->loadDataForSubscription(0);
+}
+
+void MainWindow::on_loadSubChecksForSubButton_clicked()
+{
+    int id = QInputDialog::getInt(this, "Load check data for subscription", "Subscription ID:", 0, 0);
+    subCheckModel->loadDataForSubscription(id);
+}
+
+void MainWindow::on_refreshSubChecksButton_clicked()
+{
+    subCheckModel->refresh();
+}
+
+void MainWindow::on_subCheckFilterLineEdit_textEdited(const QString& arg1)
+{
+    subCheckFilterModel->setFilterRegularExpression(arg1);
+}
+
+void MainWindow::on_viewChecksForSubButton_clicked()
+{
+    auto indices = ui->subTableView->selectionModel()->selectedRows();
+    for(auto& index: indices) index = subFilterModel->mapToSource(index);
+    auto ids = subModel->getIDs(indices);
+    if(ids.size() != 1) return;
+    subCheckModel->loadDataForSubscription(ids[0]);
+    ui->mainTabWidget->setCurrentWidget(ui->subChecksTab);
 }

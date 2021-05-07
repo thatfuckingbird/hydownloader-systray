@@ -104,6 +104,15 @@ uint64_t HyDownloaderConnection::requestSubscriptionData()
     return reply->property("requestID").toULongLong();
 }
 
+uint64_t HyDownloaderConnection::requestSubscriptionChecksData(int subscriptionID)
+{
+    QJsonObject obj;
+    obj["subscription_id"] = subscriptionID;
+    auto reply = post("/get_subscription_checks", QJsonDocument{obj});
+    reply->setProperty("requestType", QVariant::fromValue(RequestType::SubscriptionChecksData));
+    return reply->property("requestID").toULongLong();
+}
+
 uint64_t HyDownloaderConnection::requestSingleURLQueueData()
 {
     auto reply = post("/get_queued_urls", {});
@@ -240,6 +249,8 @@ void HyDownloaderConnection::handleNetworkReplyFinished(QNetworkReply* reply)
                 case RequestType::APIVersion:
                     emit apiVersionReceived(reqID, QJsonDocument::fromJson(reply->readAll()).object()["version"].toInt());
                     break;
+                case RequestType::SubscriptionChecksData:
+                    emit subscriptionChecksDataReceived(reqID, QJsonDocument::fromJson(reply->readAll()).array());
             }
         } else {
             emit replyReceived(reqID, QJsonDocument::fromJson(reply->readAll()).object());

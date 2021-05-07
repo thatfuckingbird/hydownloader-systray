@@ -31,7 +31,9 @@ add_library(hydownloader
     src/hydownloader-cpp/hydownloadersubscriptionmodel.h
     src/hydownloader-cpp/hydownloadersubscriptionmodel.cpp
     src/hydownloader-cpp/hydownloaderjsonobjectlistmodel.h
-    src/hydownloader-cpp/hydownloaderjsonobjectlistmodel.cpp)
+    src/hydownloader-cpp/hydownloaderjsonobjectlistmodel.cpp
+    src/hydownloader-cpp/hydownloadersubscriptionchecksmodel.cpp
+    src/hydownloader-cpp/hydownloadersubscriptionchecksmodel.h)
 
 target_include_directories(hydownloader-systray PRIVATE src/hydownloader-cpp)
 target_link_libraries(hydownloader PRIVATE Qt6::Core Qt6::Network Qt6::Gui)

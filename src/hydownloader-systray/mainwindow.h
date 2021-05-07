@@ -34,6 +34,7 @@ class QSettings;
 class HyDownloaderConnection;
 class HyDownloaderLogModel;
 class HyDownloaderSingleURLQueueModel;
+class HyDownloaderSubscriptionChecksModel;
 class HyDownloaderSubscriptionModel;
 class QSortFilterProxyModel;
 
@@ -69,6 +70,12 @@ private slots:
     void on_pauseSubsButton_clicked();
     void on_retryURLsButton_clicked();
     void on_pauseURLsButton_clicked();
+    void on_loadSubChecksForAllButton_clicked();
+    void on_loadSubChecksForSubButton_clicked();
+    void on_refreshSubChecksButton_clicked();
+    void on_subCheckFilterLineEdit_textEdited(const QString& arg1);
+
+    void on_viewChecksForSubButton_clicked();
 
 private:
     Ui::MainWindow* ui = nullptr;
@@ -77,6 +84,7 @@ private:
     QAction* downloadURLAction = nullptr;
     QAction* subscriptionsAction = nullptr;
     QAction* singleURLQueueAction = nullptr;
+    QAction* checksAction = nullptr;
     QAction* logsAction = nullptr;
     QAction* quitAction = nullptr;
     QAction* pauseSubsAction = nullptr;
@@ -95,9 +103,11 @@ private:
     HyDownloaderLogModel* logModel = nullptr;
     HyDownloaderSingleURLQueueModel* urlModel = nullptr;
     HyDownloaderSubscriptionModel* subModel = nullptr;
+    HyDownloaderSubscriptionChecksModel* subCheckModel = nullptr;
     QSortFilterProxyModel* logFilterModel = nullptr;
     QSortFilterProxyModel* urlFilterModel = nullptr;
     QSortFilterProxyModel* subFilterModel = nullptr;
+    QSortFilterProxyModel* subCheckFilterModel = nullptr;
     void setIcon(const QIcon& icon);
 
 protected:
