@@ -29,17 +29,19 @@ int main(int argc, char* argv[])
     a.setQuitOnLastWindowClosed(false);
 
     QCommandLineParser p;
-    QCommandLineOption opt{"settings", "Settings file", "filename"};
-    p.addOption(opt);
+    QCommandLineOption settingsOpt{"settings", "Settings file", "filename"};
+    p.addOption(settingsOpt);
+    QCommandLineOption startVisibleOpt("startVisible", "Show the main window at start.");
+    p.addOption(startVisibleOpt);
     p.process(a);
 
-    QString filename = p.value(opt);
+    QString filename = p.value(settingsOpt);
     if(!QFile::exists(filename)) {
         QTextStream out(stderr);
         out << "Invalid or missing configuration file!";
         return EXIT_FAILURE;
     }
 
-    MainWindow w{filename};
+    MainWindow w{filename, p.isSet(startVisibleOpt)};
     return a.exec();
 }

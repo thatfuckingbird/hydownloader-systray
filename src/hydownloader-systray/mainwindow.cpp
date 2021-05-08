@@ -59,12 +59,14 @@ QPixmap drawSystrayIcon(const QVector<Qt::GlobalColor>& data)
     return iconPixmap;
 }
 
-MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
+MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* parent) :
     QMainWindow(parent), ui(new Ui::MainWindow), trayIcon(new QSystemTrayIcon)
 {
     ui->setupUi(this);
 
     settings = new QSettings{settingsFile, QSettings::IniFormat};
+
+    const bool shouldBeVisible = startVisible || settings->value("startVisible").toBool();
 
     QMenu* manageMenu = new QMenu{this};
     manageMenu->setTitle("Management actions");
@@ -380,6 +382,8 @@ MainWindow::MainWindow(const QString& settingsFile, QWidget* parent) :
 
         qApp->setPalette(darkPalette);
     }
+
+    if(shouldBeVisible) show();
 }
 
 MainWindow::~MainWindow()
@@ -549,8 +553,7 @@ void MainWindow::launchAddURLsDialog(bool paused)
             QJsonObject newURL;
             newURL["url"] = url;
             newURL["paused"] = diag.startPaused();
-            if(const auto& additionalData = diag.additionalData(); additionalData.size())
-            {
+            if(const auto& additionalData = diag.additionalData(); additionalData.size()) {
                 newURL["additional_data"] = additionalData;
             }
             arr.append(newURL);

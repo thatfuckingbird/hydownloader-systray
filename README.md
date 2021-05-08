@@ -22,6 +22,11 @@ make
 
 Customize the `settings.ini` found in this repo, then launch with `hydownloader-systray --settings /path/to/settings.ini`.
 
+Command line flags:
+
+* `--settings <filename>`: specify location of settings file
+* `--startVisible`: start with the main window visible
+
 ## TODO
 
 * Color the rows of the log view according to severity

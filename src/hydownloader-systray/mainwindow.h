@@ -43,7 +43,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(const QString& settingsFile, QWidget* parent = nullptr);
+    MainWindow(const QString& settingsFile, bool startVisible, QWidget* parent = nullptr);
     ~MainWindow();
 
 private slots:
