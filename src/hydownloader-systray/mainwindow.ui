@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="mainTabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="singleURLsTab">
        <attribute name="title">
@@ -115,7 +115,7 @@
           <item>
            <widget class="QToolButton" name="refreshURLsButton">
             <property name="text">
-             <string>Refresh list</string>
+             <string>Refresh</string>
             </property>
            </widget>
           </item>
@@ -235,7 +235,7 @@
           <item>
            <widget class="QToolButton" name="refreshSubsButton">
             <property name="text">
-             <string>Refresh list</string>
+             <string>Refresh</string>
             </property>
            </widget>
           </item>
@@ -328,7 +328,7 @@
           <item>
            <widget class="QToolButton" name="refreshSubChecksButton">
             <property name="text">
-             <string>Refresh list</string>
+             <string>Refresh</string>
             </property>
            </widget>
           </item>
@@ -425,7 +425,7 @@
           <item>
            <widget class="QToolButton" name="refreshLogButton">
             <property name="text">
-             <string>Refresh list</string>
+             <string>Refresh</string>
             </property>
            </widget>
           </item>
