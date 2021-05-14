@@ -25,6 +25,7 @@ class HyDownloaderConnection;
 class HyDownloaderSingleURLQueueModel : public HyDownloaderJSONObjectListModel
 {
     Q_OBJECT
+    Q_PROPERTY(bool showArchived READ showArchived NOTIFY showArchivedChanged WRITE setShowArchived)
 
 public:
     HyDownloaderSingleURLQueueModel();
@@ -32,6 +33,16 @@ public:
     std::uint64_t addOrUpdateObject(const QJsonObject& obj) override;
     void refresh() override;
 
+public slots:
+    bool showArchived() const;
+    void setShowArchived(bool show);
+
+signals:
+    void showArchivedChanged(bool);
+
 private slots:
     void handleSingleURLQueueData(std::uint64_t requestID, const QJsonArray& data);
+
+private:
+    bool m_showArchived = false;
 };

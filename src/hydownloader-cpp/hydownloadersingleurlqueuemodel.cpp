@@ -38,7 +38,8 @@ HyDownloaderSingleURLQueueModel::HyDownloaderSingleURLQueueModel() :
        {"max_files", "Max files", true, toVariant, &QJsonValue::fromVariant},
        {"new_files", "New files", false, toVariant, &QJsonValue::fromVariant},
        {"already_seen_files", "Already seen files", false, toVariant, &QJsonValue::fromVariant},
-       {"comment", "Comment", true, toVariant, &QJsonValue::fromVariant}}} {}
+       {"comment", "Comment", true, toVariant, &QJsonValue::fromVariant},
+       {"archived", "Archived", true, toBool, fromBool}}} {}
 
 void HyDownloaderSingleURLQueueModel::setUpConnections(HyDownloaderConnection* oldConnection)
 {
@@ -54,7 +55,20 @@ std::uint64_t HyDownloaderSingleURLQueueModel::addOrUpdateObject(const QJsonObje
 void HyDownloaderSingleURLQueueModel::refresh()
 {
     clear();
-    m_connection->requestSingleURLQueueData();
+    m_connection->requestSingleURLQueueData(m_showArchived);
+}
+
+bool HyDownloaderSingleURLQueueModel::showArchived() const
+{
+    return m_showArchived;
+}
+
+void HyDownloaderSingleURLQueueModel::setShowArchived(bool show)
+{
+    if(m_showArchived != show) {
+        m_showArchived = show;
+        emit showArchivedChanged(show);
+    }
 }
 
 void HyDownloaderSingleURLQueueModel::handleSingleURLQueueData(uint64_t, const QJsonArray& data)

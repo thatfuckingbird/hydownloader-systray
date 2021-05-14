@@ -75,6 +75,10 @@ private slots:
     void on_refreshSubChecksButton_clicked();
     void on_subCheckFilterLineEdit_textEdited(const QString& arg1);
     void on_viewChecksForSubButton_clicked();
+    void on_includeArchivedSubChecksCheckBox_toggled(bool checked);
+    void on_includeArchivedURLsCheckBox_toggled(bool checked);
+    void on_archiveURLsButton_clicked();
+    void on_archiveSubChecksButton_clicked();
 
 private:
     Ui::MainWindow* ui = nullptr;
@@ -97,7 +101,9 @@ private:
     QTimer* statusUpdateIntervalTimer = nullptr;
     QTime lastUpdateTime;
     QAction* resumeSelectedURLsAction = nullptr;
+    QAction* unarchiveSelectedURLsAction = nullptr;
     QAction* resumeSelectedSubsAction = nullptr;
+    QAction* unarchiveSelectedSubChecksAction = nullptr;
     HyDownloaderConnection* connection = nullptr;
     HyDownloaderLogModel* logModel = nullptr;
     HyDownloaderSingleURLQueueModel* urlModel = nullptr;

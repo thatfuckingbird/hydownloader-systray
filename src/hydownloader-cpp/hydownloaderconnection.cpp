@@ -104,18 +104,21 @@ uint64_t HyDownloaderConnection::requestSubscriptionData()
     return reply->property("requestID").toULongLong();
 }
 
-uint64_t HyDownloaderConnection::requestSubscriptionChecksData(int subscriptionID)
+uint64_t HyDownloaderConnection::requestSubscriptionChecksData(int subscriptionID, bool showArchived)
 {
     QJsonObject obj;
     obj["subscription_id"] = subscriptionID;
+    obj["archived"] = showArchived;
     auto reply = post("/get_subscription_checks", QJsonDocument{obj});
     reply->setProperty("requestType", QVariant::fromValue(RequestType::SubscriptionChecksData));
     return reply->property("requestID").toULongLong();
 }
 
-uint64_t HyDownloaderConnection::requestSingleURLQueueData()
+uint64_t HyDownloaderConnection::requestSingleURLQueueData(bool showArchived)
 {
-    auto reply = post("/get_queued_urls", {});
+    QJsonObject obj;
+    obj["archived"] = showArchived;
+    auto reply = post("/get_queued_urls", QJsonDocument{obj});
     reply->setProperty("requestType", QVariant::fromValue(RequestType::SingleURLQueueData));
     return reply->property("requestID").toULongLong();
 }
@@ -152,6 +155,11 @@ uint64_t HyDownloaderConnection::addOrUpdateURLs(const QJsonArray& data)
 uint64_t HyDownloaderConnection::addOrUpdateSubscriptions(const QJsonArray& data)
 {
     return post("/add_or_update_subscriptions", QJsonDocument{data})->property("requestID").toULongLong();
+}
+
+uint64_t HyDownloaderConnection::addOrUpdateSubscriptionChecks(const QJsonArray& data)
+{
+    return post("/add_or_update_subscription_checks", QJsonDocument{data})->property("requestID").toULongLong();
 }
 
 uint64_t HyDownloaderConnection::pauseSubscriptions()

@@ -93,6 +93,19 @@
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="archiveURLsButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Archive</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::MenuButtonPopup</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="deleteSelectedURLsButton">
             <property name="enabled">
              <bool>false</bool>
@@ -131,6 +144,13 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="includeArchivedURLsCheckBox">
+            <property name="text">
+             <string>Show archived</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -326,6 +346,19 @@
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="archiveSubChecksButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Archive</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::MenuButtonPopup</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="refreshSubChecksButton">
             <property name="text">
              <string>Refresh</string>
@@ -344,6 +377,13 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="includeArchivedSubChecksCheckBox">
+            <property name="text">
+             <string>Show archived</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

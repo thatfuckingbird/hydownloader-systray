@@ -269,9 +269,14 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     connect(ui->urlsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&] {
         int selectionSize = ui->urlsTableView->selectionModel()->selectedRows().size();
         ui->pauseURLsButton->setEnabled(selectionSize > 0);
+        ui->archiveURLsButton->setEnabled(selectionSize > 0);
         ui->deleteSelectedURLsButton->setEnabled(selectionSize > 0);
         ui->viewLogForURLButton->setEnabled(selectionSize == 1);
         ui->retryURLsButton->setEnabled(selectionSize > 0);
+    });
+    connect(ui->subCheckTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&] {
+        int selectionSize = ui->subCheckTableView->selectionModel()->selectedRows().size();
+        ui->archiveSubChecksButton->setEnabled(selectionSize > 0);
     });
     QMenu* pauseSubsMenu = new QMenu{this};
     resumeSelectedSubsAction = pauseSubsMenu->addAction("Resume", [&] {
@@ -296,6 +301,30 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         }
     });
     ui->pauseURLsButton->setMenu(pauseURLsMenu);
+
+    QMenu* archiveURLsMenu = new QMenu{this};
+    unarchiveSelectedURLsAction = archiveURLsMenu->addAction("Unarchive", [&] {
+        auto indices = ui->urlsTableView->selectionModel()->selectedRows();
+        for(auto& index: indices) {
+            index = urlFilterModel->mapToSource(index);
+            auto row = urlModel->getRowData(index);
+            row["archived"] = QJsonValue{0};
+            urlModel->setRowData(index, row);
+        }
+    });
+    ui->archiveURLsButton->setMenu(archiveURLsMenu);
+
+    QMenu* archiveSubChecksMenu = new QMenu{this};
+    unarchiveSelectedSubChecksAction = archiveSubChecksMenu->addAction("Unarchive", [&] {
+        auto indices = ui->subCheckTableView->selectionModel()->selectedRows();
+        for(auto& index: indices) {
+            index = subCheckFilterModel->mapToSource(index);
+            auto row = subCheckModel->getRowData(index);
+            row["archived"] = QJsonValue{0};
+            subCheckModel->setRowData(index, row);
+        }
+    });
+    ui->archiveSubChecksButton->setMenu(archiveSubChecksMenu);
 
     QMenu* retryURLsMenu = new QMenu{this};
     retryURLsMenu->addAction("Retry and force overwrite", [&] {
@@ -345,6 +374,9 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         popup.addAction("Pause", ui->pauseURLsButton, &QToolButton::click);
         popup.addAction("Resume", this->resumeSelectedURLsAction, &QAction::trigger);
         popup.addSeparator();
+        popup.addAction("Archive", ui->archiveURLsButton, &QToolButton::click);
+        popup.addAction("Unarchive", this->unarchiveSelectedURLsAction, &QAction::trigger);
+        popup.addSeparator();
         popup.addAction("Delete", ui->deleteSelectedURLsButton, &QToolButton::click);
         popup.exec(ui->urlsTableView->mapToGlobal(pos));
     });
@@ -356,6 +388,17 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         popup.exec(ui->logTableView->mapToGlobal(pos));
     });
     ui->logTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(ui->subCheckTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos) {
+        int selectionSize = ui->subCheckTableView->selectionModel()->selectedRows().size();
+        if(selectionSize == 0) return;
+
+        QMenu popup;
+        popup.addAction("Archive", ui->archiveSubChecksButton, &QToolButton::click);
+        popup.addAction("Unarchive", this->unarchiveSelectedSubChecksAction, &QAction::trigger);
+        popup.exec(ui->subCheckTableView->mapToGlobal(pos));
+    });
+    ui->subCheckTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     if(settings->value("applyDarkPalette").toBool()) {
         QPalette darkPalette;
@@ -654,4 +697,38 @@ void MainWindow::on_viewChecksForSubButton_clicked()
     if(ids.size() != 1) return;
     subCheckModel->loadDataForSubscription(ids[0]);
     ui->mainTabWidget->setCurrentWidget(ui->subChecksTab);
+}
+
+void MainWindow::on_includeArchivedSubChecksCheckBox_toggled(bool checked)
+{
+    subCheckModel->setShowArchived(checked);
+    subCheckModel->refresh();
+}
+
+void MainWindow::on_includeArchivedURLsCheckBox_toggled(bool checked)
+{
+    urlModel->setShowArchived(checked);
+    urlModel->refresh();
+}
+
+void MainWindow::on_archiveURLsButton_clicked()
+{
+    auto indices = ui->subTableView->selectionModel()->selectedRows();
+    for(auto& index: indices) {
+        index = subFilterModel->mapToSource(index);
+        auto row = subModel->getRowData(index);
+        row["archived"] = QJsonValue{1};
+        subModel->setRowData(index, row);
+    }
+}
+
+void MainWindow::on_archiveSubChecksButton_clicked()
+{
+    auto indices = ui->subCheckTableView->selectionModel()->selectedRows();
+    for(auto& index: indices) {
+        index = subCheckFilterModel->mapToSource(index);
+        auto row = subCheckModel->getRowData(index);
+        row["archived"] = QJsonValue{1};
+        subCheckModel->setRowData(index, row);
+    }
 }

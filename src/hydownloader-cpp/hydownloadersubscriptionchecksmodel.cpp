@@ -27,7 +27,8 @@ HyDownloaderSubscriptionChecksModel::HyDownloaderSubscriptionChecksModel() :
        {"time_finished", "Time finished", false, toDateTime, fromDateTime},
        {"status", "Result status", false, toVariant, &QJsonValue::fromVariant},
        {"new_files", "New files", false, toVariant, &QJsonValue::fromVariant},
-       {"already_seen_files", "Already seen files", false, toVariant, &QJsonValue::fromVariant}}},
+       {"already_seen_files", "Already seen files", false, toVariant, &QJsonValue::fromVariant},
+       {"archived", "Archived", true, toBool, fromBool}}},
     m_statusText{"No data loaded"} {}
 
 void HyDownloaderSubscriptionChecksModel::setUpConnections(HyDownloaderConnection* oldConnection)
@@ -37,16 +38,16 @@ void HyDownloaderSubscriptionChecksModel::setUpConnections(HyDownloaderConnectio
     emit statusTextChanged(m_statusText);
 }
 
-std::uint64_t HyDownloaderSubscriptionChecksModel::addOrUpdateObject(const QJsonObject&)
+std::uint64_t HyDownloaderSubscriptionChecksModel::addOrUpdateObject(const QJsonObject& obj)
 {
-    return false;
+    return m_connection->addOrUpdateSubscriptionChecks({obj});
 }
 
 void HyDownloaderSubscriptionChecksModel::refresh()
 {
     clear();
     if(m_lastRequestedID >= 0) {
-        m_connection->requestSubscriptionChecksData(m_lastRequestedID);
+        m_connection->requestSubscriptionChecksData(m_lastRequestedID, m_showArchived);
         m_statusText = "Loading subscription check data...";
         emit statusTextChanged(m_statusText);
     }
@@ -68,6 +69,19 @@ void HyDownloaderSubscriptionChecksModel::loadDataForSubscription(int subscripti
 QString HyDownloaderSubscriptionChecksModel::statusText() const
 {
     return m_statusText;
+}
+
+bool HyDownloaderSubscriptionChecksModel::showArchived() const
+{
+    return m_showArchived;
+}
+
+void HyDownloaderSubscriptionChecksModel::setShowArchived(bool show)
+{
+    if(m_showArchived != show) {
+        m_showArchived = show;
+        emit showArchivedChanged(show);
+    }
 }
 
 void HyDownloaderSubscriptionChecksModel::handleSubscriptionChecksData(uint64_t, const QJsonArray& data)

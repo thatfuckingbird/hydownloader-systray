@@ -26,6 +26,7 @@ class HyDownloaderSubscriptionChecksModel : public HyDownloaderJSONObjectListMod
 {
     Q_OBJECT
     Q_PROPERTY(QString statusText READ statusText NOTIFY statusTextChanged)
+    Q_PROPERTY(bool showArchived READ showArchived NOTIFY showArchivedChanged WRITE setShowArchived)
 
 public:
     HyDownloaderSubscriptionChecksModel();
@@ -37,9 +38,12 @@ public:
 public slots:
     void loadDataForSubscription(int subscriptionID);
     QString statusText() const;
+    bool showArchived() const;
+    void setShowArchived(bool show);
 
 signals:
     void statusTextChanged(const QString&);
+    void showArchivedChanged(bool);
 
 private slots:
     void handleSubscriptionChecksData(std::uint64_t requestID, const QJsonArray& data);
@@ -47,4 +51,5 @@ private slots:
 private:
     int m_lastRequestedID = 0;
     QString m_statusText;
+    bool m_showArchived = false;
 };
