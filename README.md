@@ -34,6 +34,7 @@ Command line flags:
 * Add log rotation
 * Add preview of downloaded files
 * Add support for multiple instances
+* Show number of selected items in status bar
 
 ## License
 
