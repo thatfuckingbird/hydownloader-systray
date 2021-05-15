@@ -38,9 +38,9 @@ void HyDownloaderSubscriptionChecksModel::setUpConnections(HyDownloaderConnectio
     emit statusTextChanged(m_statusText);
 }
 
-std::uint64_t HyDownloaderSubscriptionChecksModel::addOrUpdateObject(const QJsonObject& obj)
+std::uint64_t HyDownloaderSubscriptionChecksModel::addOrUpdateObjects(const QJsonArray& objs)
 {
-    return m_connection->addOrUpdateSubscriptionChecks({obj});
+    return m_connection->addOrUpdateSubscriptionChecks(objs);
 }
 
 void HyDownloaderSubscriptionChecksModel::refresh()

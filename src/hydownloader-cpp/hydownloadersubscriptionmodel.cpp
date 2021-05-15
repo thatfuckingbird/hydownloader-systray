@@ -43,9 +43,9 @@ void HyDownloaderSubscriptionModel::setUpConnections(HyDownloaderConnection* old
     connect(m_connection, &HyDownloaderConnection::subscriptionDataReceived, this, &HyDownloaderSubscriptionModel::handleSubscriptionData);
 }
 
-std::uint64_t HyDownloaderSubscriptionModel::addOrUpdateObject(const QJsonObject& obj)
+std::uint64_t HyDownloaderSubscriptionModel::addOrUpdateObjects(const QJsonArray& objs)
 {
-    return m_connection->addOrUpdateSubscriptions({obj});
+    return m_connection->addOrUpdateSubscriptions(objs);
 }
 
 void HyDownloaderSubscriptionModel::refresh()

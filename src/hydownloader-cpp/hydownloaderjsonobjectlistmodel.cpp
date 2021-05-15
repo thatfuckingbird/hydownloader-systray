@@ -85,7 +85,7 @@ bool HyDownloaderJSONObjectListModel::setData(const QModelIndex& index, const QV
     updateObj["id"] = m_data[index.row()].toObject()["id"];
     updateObj[key] = jsonValue;
 
-    m_updateIDs.insert(addOrUpdateObject(updateObj));
+    m_updateIDs.insert(addOrUpdateObjects({updateObj}));
 
     return true;
 }
@@ -107,11 +107,23 @@ QJsonObject HyDownloaderJSONObjectListModel::getRowData(const QModelIndex& rowIn
     return m_data[rowIndex.row()].toObject();
 }
 
-void HyDownloaderJSONObjectListModel::setRowData(const QModelIndex& rowIndex, const QJsonObject& obj)
+void HyDownloaderJSONObjectListModel::setRowData(const QVector<QModelIndex>& indices, const QJsonArray& objs)
 {
-    m_data[rowIndex.row()] = obj;
-    m_updateIDs.insert(addOrUpdateObject(obj));
-    emit dataChanged(createIndex(rowIndex.row(), 0), createIndex(rowIndex.row(), m_columnData.size() - 1));
+    if(indices.size() != objs.size() || indices.isEmpty()) return;
+    int minRow = std::numeric_limits<int>::max();
+    int maxRow = 0;
+    for(int i = 0; i < indices.size(); ++i) {
+        const int row = indices[i].row();
+        m_data[row] = objs[i];
+        if(row > maxRow) {
+            maxRow = row;
+        }
+        if(row < minRow) {
+            minRow = row;
+        }
+    }
+    m_updateIDs.insert(addOrUpdateObjects(objs));
+    emit dataChanged(createIndex(minRow, 0), createIndex(maxRow, m_columnData.size() - 1));
 }
 
 void HyDownloaderJSONObjectListModel::handleReplyReceived(uint64_t requestID, const QJsonObject&)

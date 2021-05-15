@@ -35,7 +35,7 @@ public:
     void setConnection(HyDownloaderConnection* connection);
     virtual void setUpConnections(HyDownloaderConnection* oldConnection) = 0;
     virtual void refresh() = 0;
-    virtual std::uint64_t addOrUpdateObject(const QJsonObject& obj) = 0;
+    virtual std::uint64_t addOrUpdateObjects(const QJsonArray& objs) = 0;
     QVector<int> getIDs(const QModelIndexList& indices) const;
     virtual void clear();
     int columnCount(const QModelIndex& parent) const override;
@@ -45,7 +45,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex& index) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QJsonObject getRowData(const QModelIndex& rowIndex) const;
-    void setRowData(const QModelIndex& rowIndex, const QJsonObject& obj);
+    void setRowData(const QVector<QModelIndex>& indices, const QJsonArray& objs);
 
 private:
     QSet<std::uint64_t> m_updateIDs;

@@ -47,9 +47,9 @@ void HyDownloaderSingleURLQueueModel::setUpConnections(HyDownloaderConnection* o
     connect(m_connection, &HyDownloaderConnection::singleURLQueueDataReceived, this, &HyDownloaderSingleURLQueueModel::handleSingleURLQueueData);
 }
 
-std::uint64_t HyDownloaderSingleURLQueueModel::addOrUpdateObject(const QJsonObject& obj)
+std::uint64_t HyDownloaderSingleURLQueueModel::addOrUpdateObjects(const QJsonArray& objs)
 {
-    return m_connection->addOrUpdateURLs({obj});
+    return m_connection->addOrUpdateURLs(objs);
 }
 
 void HyDownloaderSingleURLQueueModel::refresh()

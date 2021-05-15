@@ -30,7 +30,7 @@ class HyDownloaderSingleURLQueueModel : public HyDownloaderJSONObjectListModel
 public:
     HyDownloaderSingleURLQueueModel();
     void setUpConnections(HyDownloaderConnection* oldConnection) override;
-    std::uint64_t addOrUpdateObject(const QJsonObject& obj) override;
+    std::uint64_t addOrUpdateObjects(const QJsonArray& objs) override;
     void refresh() override;
 
 public slots:

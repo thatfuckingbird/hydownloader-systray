@@ -31,7 +31,7 @@ class HyDownloaderSubscriptionChecksModel : public HyDownloaderJSONObjectListMod
 public:
     HyDownloaderSubscriptionChecksModel();
     void setUpConnections(HyDownloaderConnection* oldConnection) override;
-    std::uint64_t addOrUpdateObject(const QJsonObject& obj) override;
+    std::uint64_t addOrUpdateObjects(const QJsonArray& objs) override;
     void refresh() override;
     void clear() override;
 
