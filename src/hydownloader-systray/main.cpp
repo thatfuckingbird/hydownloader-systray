@@ -35,10 +35,16 @@ int main(int argc, char* argv[])
     p.addOption(startVisibleOpt);
     p.process(a);
 
+    QTextStream errout(stderr);
+
     QString filename = p.value(settingsOpt);
+    if(filename.isEmpty()) {
+        QString defaultSettingsFilename = QCoreApplication::applicationDirPath() + "/settings.ini";
+        errout << "No settings file specified, looking for one beside the executable." << Qt::endl;
+        if(QFile::exists(defaultSettingsFilename)) filename = defaultSettingsFilename;
+    }
     if(!QFile::exists(filename)) {
-        QTextStream out(stderr);
-        out << "Invalid or missing configuration file!";
+        errout << "Invalid or missing configuration file!" << Qt::endl;
         return EXIT_FAILURE;
     }
 
