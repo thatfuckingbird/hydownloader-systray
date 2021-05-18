@@ -54,6 +54,12 @@ jobs:
         run: |
           7z a -tzip hydownloader-systray.zip '${{ github.workspace }}\release'
       - 
+        name: Delete old releases
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        with:
+          keep_latest: 0
+          delete_tags: true
+      - 
         name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
