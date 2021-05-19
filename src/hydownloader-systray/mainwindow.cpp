@@ -693,7 +693,7 @@ void MainWindow::on_loadSubChecksForAllButton_clicked()
 
 void MainWindow::on_loadSubChecksForSubButton_clicked()
 {
-    int id = QInputDialog::getInt(this, "Load check data for subscription", "Subscription ID:", 0, 0);
+    int id = QInputDialog::getInt(this, "Load check history for subscription", "Subscription ID:", 0, 0);
     subCheckModel->loadDataForSubscription(id);
 }
 

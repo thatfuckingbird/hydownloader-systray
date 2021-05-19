@@ -48,7 +48,7 @@ void HyDownloaderSubscriptionChecksModel::refresh()
     clear();
     if(m_lastRequestedID >= 0) {
         m_connection->requestSubscriptionChecksData(m_lastRequestedID, m_showArchived);
-        m_statusText = "Loading subscription check data...";
+        m_statusText = "Loading subscription check history...";
         emit statusTextChanged(m_statusText);
     }
 }
@@ -89,9 +89,9 @@ void HyDownloaderSubscriptionChecksModel::handleSubscriptionChecksData(uint64_t,
     clear();
 
     if(m_lastRequestedID) {
-        m_statusText = QString{"Subscription check data for subscription %1"}.arg(m_lastRequestedID);
+        m_statusText = QString{"Subscription check history for subscription %1"}.arg(m_lastRequestedID);
     } else {
-        m_statusText = "Subscription check data for all subscriptions";
+        m_statusText = "Subscription check history for all subscriptions";
     }
     emit statusTextChanged(m_statusText);
 
