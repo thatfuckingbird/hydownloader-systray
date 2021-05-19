@@ -63,4 +63,4 @@ jobs:
           release_name: "Latest Release"
           tag: "dev"
           overwrite: true
-          body: "Latest build of hydownloader-systray. Even if the 'release' is old, the attached asset is always up to date."
+          body: "Latest build of hydownloader-systray. Even if the 'release' is old, the attached asset is always up to date (only hydownloader-systray.zip is updated, ignore source code archives)."
