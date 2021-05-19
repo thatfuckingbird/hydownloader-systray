@@ -60,6 +60,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: hydownloader-systray.zip
           asset_name: hydownloader-systray.zip
+          release_name: "Latest Release"
           tag: "dev"
           overwrite: true
-          body: "Latest build of hydownloader-systray"
+          body: "Latest build of hydownloader-systray. Even if the 'release' is old, the attached asset is always up to date."
