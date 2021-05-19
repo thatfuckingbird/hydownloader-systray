@@ -18,9 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#if __GNUC__ > 10
-#include <source_location>
-#endif
 #include <QAbstractListModel>
 #include <QJsonArray>
 #include <QHash>
