@@ -43,9 +43,11 @@ void HyDownloaderLogModel::loadSubscriptionLog(int id, bool unsupportedURLs)
 {
     if(!m_connection) return;
     clear();
+    if(!m_showOnlyLatest) {
     auto requestID = m_connection->requestStaticData(QString{"logs/subscription-%2-%1gallery-dl-old.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
     m_receivedData.push_back({requestID, {}});
-    requestID = m_connection->requestStaticData(QString{"logs/subscription-%2-%1gallery-dl-latest.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
+    }
+    auto requestID = m_connection->requestStaticData(QString{"logs/subscription-%2-%1gallery-dl-latest.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
     m_receivedData.push_back({requestID, {}});
 
     m_lastLoadedLog = LogType::SubscriptionLog;
@@ -73,15 +75,34 @@ void HyDownloaderLogModel::loadSingleURLQueueLog(int id, bool unsupportedURLs)
 {
     if(!m_connection) return;
     clear();
+    if(!m_showOnlyLatest) {
     auto requestID = m_connection->requestStaticData(QString{"logs/single-urls-%2-%1gallery-dl-old.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
     m_receivedData.push_back({requestID, {}});
-    requestID = m_connection->requestStaticData(QString{"logs/single-urls-%2-%1gallery-dl-latest.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
+    }
+    auto requestID = m_connection->requestStaticData(QString{"logs/single-urls-%2-%1gallery-dl-latest.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
     m_receivedData.push_back({requestID, {}});
 
     m_lastLoadedLog = LogType::SingleURLQueueLog;
     m_lastLoadedLogParams = {id, unsupportedURLs};
 
     m_statusText = QString{"Loading log for URL %1..."}.arg(id);
+    emit statusTextChanged(m_statusText);
+}
+
+void HyDownloaderLogModel::loadStatusLog()
+{
+    clear();
+    m_lastLoadedLog = LogType::StatusLog;
+    m_lastLoadedLogParams.clear();
+    if(m_statusLogLevels.size()) {
+        beginInsertRows({}, 0, m_statusLogLevels.size() - 1);
+        m_logLevels = m_statusLogLevels;
+        m_rawLines = m_rawStatusLines;
+        m_lines = m_statusLines;
+        endInsertRows();
+    }
+
+    m_statusText = "Client status update log";
     emit statusTextChanged(m_statusText);
 }
 
@@ -128,6 +149,9 @@ void HyDownloaderLogModel::refresh()
             break;
         case LogType::SingleURLQueueLog:
             loadSingleURLQueueLog(m_lastLoadedLogParams[0].toInt(), m_lastLoadedLogParams[1].toBool());
+            break;
+        case LogType::StatusLog:
+            loadStatusLog();
             break;
     }
 }
@@ -183,9 +207,54 @@ QVariant HyDownloaderLogModel::headerData(int section, Qt::Orientation orientati
     }
 }
 
+void HyDownloaderLogModel::addStatusLogLine(HyDownloaderLogModel::LogLevel level, const QString &text)
+{
+        const QString newStatusLine = QString{"[%1] %2"}.arg(QDateTime::currentDateTime().toString(Qt::ISODate), text);
+        if(!m_statusLogLevels.isEmpty() && m_statusLogLevels.last() == level && m_rawStatusLines.last() == text) {
+            m_statusLines.last() = newStatusLine;
+            if(m_lastLoadedLog == LogType::StatusLog) {
+                m_lines.last() = newStatusLine;
+                emit dataChanged(createIndex(m_statusLines.size() - 1, 0), createIndex(m_statusLines.size() - 1, 1));
+            }
+        } else {
+            m_statusLogLevels.append(level);
+            m_rawStatusLines.append(text);
+            m_statusLines.append(newStatusLine);
+            if(m_lastLoadedLog == LogType::StatusLog) {
+                beginInsertRows({}, m_lines.size(), m_lines.size());
+                m_lines.append(m_statusLines.back());
+                m_rawLines.append(m_rawStatusLines.back());
+                m_logLevels.append(m_statusLogLevels.back());
+                endInsertRows();
+            }
+        }
+        if(m_statusLines.size() > 20000) {
+            m_statusLines = m_statusLines.mid(10000);
+            m_rawStatusLines = m_rawStatusLines.mid(10000);
+            m_statusLogLevels = m_statusLogLevels.mid(10000);
+            if(m_lastLoadedLog == LogType::StatusLog) refresh();
+        }
+}
+
 QString HyDownloaderLogModel::statusText() const
 {
     return m_statusText;
+}
+
+bool HyDownloaderLogModel::showOnlyLatest() const
+{
+    return m_showOnlyLatest;
+}
+
+void HyDownloaderLogModel::setShowOnlyLatest(bool onlyLatest)
+{
+    if(onlyLatest != m_showOnlyLatest) {
+        m_showOnlyLatest = onlyLatest;
+        emit showOnlyLatestChanged(m_showOnlyLatest);
+        if(m_lastLoadedLog == LogType::SubscriptionLog || m_lastLoadedLog == LogType::SingleURLQueueLog) {
+            refresh();
+        }
+    }
 }
 
 void HyDownloaderLogModel::handleStaticData(uint64_t requestID, const QByteArray& data)
@@ -233,6 +302,9 @@ void HyDownloaderLogModel::handleStaticData(uint64_t requestID, const QByteArray
             break;
         case LogType::SingleURLQueueLog:
             m_statusText = QString{"Log for URL %1"}.arg(m_lastLoadedLogParams[0].toInt());
+            break;
+        case LogType::StatusLog:
+            m_statusText.clear();
             break;
     }
 

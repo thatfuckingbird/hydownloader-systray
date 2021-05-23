@@ -28,6 +28,7 @@ class HyDownloaderLogModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString statusText READ statusText NOTIFY statusTextChanged)
+    Q_PROPERTY(bool showOnlyLatest READ showOnlyLatest WRITE setShowOnlyLatest NOTIFY showOnlyLatestChanged)
 
 public:
     enum class LogLevel {
@@ -45,6 +46,7 @@ public:
     void loadSubscriptionLog(int id, bool unsupportedURLs = false);
     void loadDaemonLog();
     void loadSingleURLQueueLog(int id, bool unsupportedURLs = false);
+    void loadStatusLog();
     void clear();
     void copyToClipboard(const QModelIndexList& indices = {});
     void refresh();
@@ -54,10 +56,17 @@ public:
     QVariant data(const QModelIndex& index, int role) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-    Q_SCRIPTABLE QString statusText() const;
+    void addStatusLogLine(LogLevel level, const QString& text);
+
+    Q_INVOKABLE QString statusText() const;
+    Q_INVOKABLE bool showOnlyLatest() const;
+
+public slots:
+    void setShowOnlyLatest(bool onlyLatest);
 
 signals:
     void statusTextChanged(const QString&);
+    void showOnlyLatestChanged(bool);
 
 private slots:
     void handleStaticData(std::uint64_t requestID, const QByteArray& data);
@@ -68,7 +77,8 @@ private:
         NoLog,
         SubscriptionLog,
         DaemonLog,
-        SingleURLQueueLog
+        SingleURLQueueLog,
+        StatusLog
     };
     LogType m_lastLoadedLog = LogType::NoLog;
     QVariantList m_lastLoadedLogParams;
@@ -79,4 +89,8 @@ private:
     HyDownloaderConnection* m_connection = nullptr;
     QString m_statusText;
     std::pair<QString, LogLevel> processLine(const QString& line);
+    QStringList m_statusLines;
+    QStringList m_rawStatusLines;
+    QVector<LogLevel> m_statusLogLevels;
+    bool m_showOnlyLatest = false;
 };

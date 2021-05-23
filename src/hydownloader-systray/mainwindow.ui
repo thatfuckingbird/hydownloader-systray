@@ -466,6 +466,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="loadStatusHistoryButton">
+            <property name="text">
+             <string>Show systray status history</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="loadSingleURLQueueLogButton">
             <property name="text">
              <string>Load single URL log...</string>
@@ -505,6 +512,44 @@
              </size>
             </property>
            </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="onlyLatestCheckBox">
+            <property name="text">
+             <string>Only show log entries from the most recent run (applies to subscriptions and single URLs)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QLabel" name="logSelectionLabel">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

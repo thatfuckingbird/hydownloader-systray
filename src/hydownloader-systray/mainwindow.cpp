@@ -324,7 +324,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     statusUpdateIntervalTimer = new QTimer{this};
     connect(statusUpdateIntervalTimer, &QTimer::timeout, [&] {
         if(lastUpdateTime.secsTo(QTime::currentTime()) >= 30) {
-            setStatusText(QString{"No status update received in the past 30 seconds"});
+            setStatusText(HyDownloaderLogModel::LogLevel::Error, QString{"No status update received in the past 30 seconds"});
             setIcon(QIcon{drawSystrayIcon({Qt::red})});
         }
         if(settings->value("aggressiveUpdates").toBool()) {
@@ -535,6 +535,8 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     }
 
     if(shouldBeVisible) show();
+
+    setStatusText(HyDownloaderLogModel::LogLevel::Info, "hydownloader-systray started");
 }
 
 MainWindow::~MainWindow()
@@ -677,11 +679,12 @@ void MainWindow::on_addURLButton_clicked()
     launchAddURLsDialog(true);
 }
 
-void MainWindow::setStatusText(const QString& text)
+void MainWindow::setStatusText(HyDownloaderLogModel::LogLevel level, const QString& text)
 {
     trayIcon->setToolTip(text);
     ui->statusBar->showMessage(text);
     ui->statusBar->setToolTip(text);
+    logModel->addStatusLogLine(level, text);
 }
 
 Qt::GlobalColor MainWindow::statusToColor(const QString& statusText)
@@ -868,4 +871,14 @@ void MainWindow::on_archiveSubChecksButton_clicked()
         rowData.append(row);
     }
     subCheckModel->setRowData(indices, rowData);
+}
+
+void MainWindow::on_loadStatusHistoryButton_clicked()
+{
+    logModel->loadStatusLog();
+}
+
+void MainWindow::on_onlyLatestCheckBox_stateChanged(int arg1)
+{
+    logModel->setShowOnlyLatest(arg1);
 }

@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <QMainWindow>
 #include <QTime>
+#include "hydownloaderlogmodel.h"
 
 namespace Ui
 {
@@ -30,6 +31,8 @@ class QSystemTrayIcon;
 class QAction;
 class QTimer;
 class QSettings;
+class QToolButton;
+class QActionGroup;
 
 class HyDownloaderConnection;
 class HyDownloaderLogModel;
@@ -63,7 +66,7 @@ private slots:
     void on_refreshURLsButton_clicked();
     void on_deleteSelectedURLsButton_clicked();
     void on_addURLButton_clicked();
-    void setStatusText(const QString& text);
+    void setStatusText(HyDownloaderLogModel::LogLevel level, const QString& text);
     Qt::GlobalColor statusToColor(const QString& statusText);
     Qt::GlobalColor queueSizeToColor(int size);
     void on_recheckSubsButton_clicked();
@@ -79,6 +82,8 @@ private slots:
     void on_includeArchivedURLsCheckBox_toggled(bool checked);
     void on_archiveURLsButton_clicked();
     void on_archiveSubChecksButton_clicked();
+    void on_loadStatusHistoryButton_clicked();
+    void on_onlyLatestCheckBox_stateChanged(int arg1);
 
 private:
     Ui::MainWindow* ui = nullptr;
