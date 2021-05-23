@@ -327,6 +327,11 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
             setStatusText(QString{"No status update received in the past 30 seconds"});
             setIcon(QIcon{drawSystrayIcon({Qt::red})});
         }
+        if(settings->value("aggressiveUpdates").toBool()) {
+            urlModel->refresh(false);
+            subModel->refresh(false);
+            subCheckModel->refresh(false);
+        }
     });
     lastUpdateTime = QTime::currentTime();
     statusUpdateIntervalTimer->setInterval(30000);
