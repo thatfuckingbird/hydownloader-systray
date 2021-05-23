@@ -50,6 +50,10 @@ public:
     ~MainWindow();
 
 private slots:
+    void updateSubCountInfoAndButtons();
+    void updateURLCountInfoAndButtons();
+    void updateSubCheckCountInfoAndButtons();
+    void updateLogCountInfo();
     void on_logFilterLineEdit_textEdited(const QString& arg1);
     void on_refreshLogButton_clicked();
     void on_loadSubscriptionLogButton_clicked();

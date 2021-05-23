@@ -338,29 +338,28 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     statusUpdateIntervalTimer->start();
 
     ui->mainTabWidget->setCurrentIndex(0);
-    ui->urlsTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    ui->subTableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
 
-    connect(ui->subTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&] {
-        int selectionSize = ui->subTableView->selectionModel()->selectedRows().size();
-        ui->recheckSubsButton->setEnabled(selectionSize > 0);
-        ui->deleteSelectedSubsButton->setEnabled(selectionSize > 0);
-        ui->viewLogForSubButton->setEnabled(selectionSize == 1);
-        ui->viewChecksForSubButton->setEnabled(selectionSize == 1);
-        ui->pauseSubsButton->setEnabled(selectionSize > 0);
-    });
-    connect(ui->urlsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&] {
-        int selectionSize = ui->urlsTableView->selectionModel()->selectedRows().size();
-        ui->pauseURLsButton->setEnabled(selectionSize > 0);
-        ui->archiveURLsButton->setEnabled(selectionSize > 0);
-        ui->deleteSelectedURLsButton->setEnabled(selectionSize > 0);
-        ui->viewLogForURLButton->setEnabled(selectionSize == 1);
-        ui->retryURLsButton->setEnabled(selectionSize > 0);
-    });
-    connect(ui->subCheckTableView->selectionModel(), &QItemSelectionModel::selectionChanged, [&] {
-        int selectionSize = ui->subCheckTableView->selectionModel()->selectedRows().size();
-        ui->archiveSubChecksButton->setEnabled(selectionSize > 0);
-    });
+    connect(ui->subTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateSubCountInfoAndButtons);
+    connect(ui->urlsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateURLCountInfoAndButtons);
+    connect(ui->subCheckTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateSubCheckCountInfoAndButtons);
+    connect(ui->logTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateLogCountInfo);
+
+    connect(logModel, &QAbstractItemModel::modelReset, this, &MainWindow::updateLogCountInfo);
+    connect(logModel, &QAbstractItemModel::rowsInserted, this, &MainWindow::updateLogCountInfo);
+    connect(logModel, &QAbstractItemModel::rowsRemoved, this, &MainWindow::updateLogCountInfo);
+
+    connect(subModel, &QAbstractItemModel::modelReset, this, &MainWindow::updateSubCountInfoAndButtons);
+    connect(subModel, &QAbstractItemModel::rowsInserted, this, &MainWindow::updateSubCountInfoAndButtons);
+    connect(subModel, &QAbstractItemModel::rowsRemoved, this, &MainWindow::updateSubCountInfoAndButtons);
+
+    connect(urlModel, &QAbstractItemModel::modelReset, this, &MainWindow::updateURLCountInfoAndButtons);
+    connect(urlModel, &QAbstractItemModel::rowsInserted, this, &MainWindow::updateURLCountInfoAndButtons);
+    connect(urlModel, &QAbstractItemModel::rowsRemoved, this, &MainWindow::updateURLCountInfoAndButtons);
+
+    connect(subCheckModel, &QAbstractItemModel::modelReset, this, &MainWindow::updateSubCheckCountInfoAndButtons);
+    connect(subCheckModel, &QAbstractItemModel::rowsInserted, this, &MainWindow::updateSubCheckCountInfoAndButtons);
+    connect(subCheckModel, &QAbstractItemModel::rowsRemoved, this, &MainWindow::updateSubCheckCountInfoAndButtons);
+
     QMenu* pauseSubsMenu = new QMenu{this};
     resumeSelectedSubsAction = pauseSubsMenu->addAction("Resume", [&] {
         auto indices = ui->subTableView->selectionModel()->selectedRows();
@@ -542,6 +541,52 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::updateSubCountInfoAndButtons()
+{
+    const int selectionSize = ui->subTableView->selectionModel()->selectedRows().size();
+    ui->recheckSubsButton->setEnabled(selectionSize > 0);
+    ui->deleteSelectedSubsButton->setEnabled(selectionSize > 0);
+    ui->viewLogForSubButton->setEnabled(selectionSize == 1);
+    ui->viewChecksForSubButton->setEnabled(selectionSize == 1);
+    ui->pauseSubsButton->setEnabled(selectionSize > 0);
+    ui->subsLabel->setText(QString{"%1 selected, %2 total loaded subscriptions"}.arg(
+                                          QLocale{}.toString(selectionSize),
+                                          QLocale{}.toString(subModel->rowCount({}))
+                                          ));
+}
+
+void MainWindow::updateURLCountInfoAndButtons()
+{
+    const int selectionSize = ui->urlsTableView->selectionModel()->selectedRows().size();
+    ui->pauseURLsButton->setEnabled(selectionSize > 0);
+    ui->archiveURLsButton->setEnabled(selectionSize > 0);
+    ui->deleteSelectedURLsButton->setEnabled(selectionSize > 0);
+    ui->viewLogForURLButton->setEnabled(selectionSize == 1);
+    ui->retryURLsButton->setEnabled(selectionSize > 0);
+    ui->urlsLabel->setText(QString{"%1 selected, %2 total loaded URLs"}.arg(
+                                          QLocale{}.toString(selectionSize),
+                                          QLocale{}.toString(urlModel->rowCount({}))
+                                          ));
+}
+
+void MainWindow::updateSubCheckCountInfoAndButtons()
+{
+    const int selectionSize = ui->subCheckTableView->selectionModel()->selectedRows().size();
+    ui->archiveSubChecksButton->setEnabled(selectionSize > 0);
+    ui->subChecksLabel->setText(QString{"%1 selected, %2 total loaded subscription checks"}.arg(
+                                          QLocale{}.toString(selectionSize),
+                                          QLocale{}.toString(subCheckModel->rowCount({}))
+                                          ));
+}
+
+void MainWindow::updateLogCountInfo()
+{
+    ui->logSelectionLabel->setText(QString{"%1 selected, %2 total loaded log entries"}.arg(
+                                          QLocale{}.toString(ui->logTableView->selectionModel()->selectedRows().size()),
+                                          QLocale{}.toString(logModel->rowCount({}))
+                                       ));
 }
 
 void MainWindow::setCurrentConnection(const QString &id)
