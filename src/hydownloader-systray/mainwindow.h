@@ -54,6 +54,8 @@ private slots:
     void updateURLCountInfoAndButtons();
     void updateSubCheckCountInfoAndButtons();
     void updateLogCountInfo();
+    void setCurrentConnection(const QString& id);
+
     void on_logFilterLineEdit_textEdited(const QString& arg1);
     void on_refreshLogButton_clicked();
     void on_loadSubscriptionLogButton_clicked();
