@@ -666,6 +666,7 @@ void MainWindow::on_deleteSelectedSubsButton_clicked()
     if(ids.isEmpty()) return;
     if(QMessageBox::question(this, "Delete subscriptions", QString{"Are you sure you want to delete the %1 selected subscriptions?"}.arg(QString::number(ids.size()))) == QMessageBox::Yes) {
         currentConnection->deleteSubscriptions(ids);
+        subModel->refresh();
     }
 }
 
@@ -717,6 +718,7 @@ void MainWindow::on_deleteSelectedURLsButton_clicked()
     if(ids.isEmpty()) return;
     if(QMessageBox::question(this, "Delete URLs", QString{"Are you sure you want to delete the %1 selected URLs?"}.arg(QString::number(ids.size()))) == QMessageBox::Yes) {
         currentConnection->deleteURLs(ids);
+        urlModel->refresh();
     }
 }
 
