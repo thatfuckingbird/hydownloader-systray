@@ -55,6 +55,8 @@ public slots:
     void setTransferTimeout(int timeout);
     int transferTimeout() const;
     void setEnabled(bool enabled);
+    std::uint64_t requestLastFilesForURLs(const QVector<int>& urlIDs);
+    std::uint64_t requestLastFilesForSubscriptions(const QVector<int>& subscriptionIDs);
     std::uint64_t requestStaticData(QString filePath);
     std::uint64_t requestStatusInformation();
     std::uint64_t requestSubscriptionData();
@@ -83,7 +85,7 @@ signals:
     void singleURLQueueDataReceived(std::uint64_t requestID, const QJsonArray& data);
     void subscriptionChecksDataReceived(std::uint64_t requestID, const QJsonArray& data);
     void apiVersionReceived(std::uint64_t requestID, int version);
-    void replyReceived(std::uint64_t requestID, const QJsonObject& data);
+    void replyReceived(std::uint64_t requestID, const QJsonDocument& data);
     void enabledChanged(bool);
 
 private slots:
