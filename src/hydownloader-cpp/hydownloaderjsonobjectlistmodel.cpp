@@ -27,6 +27,7 @@ void HyDownloaderJSONObjectListModel::setConnection(HyDownloaderConnection* conn
     setUpConnections(oldConnection);
     if(oldConnection) disconnect(oldConnection, &HyDownloaderConnection::replyReceived, this, &HyDownloaderJSONObjectListModel::handleReplyReceived);
     connect(m_connection, &HyDownloaderConnection::replyReceived, this, &HyDownloaderJSONObjectListModel::handleReplyReceived);
+    clear();
 }
 
 QVector<int> HyDownloaderJSONObjectListModel::getIDs(const QModelIndexList& indices) const

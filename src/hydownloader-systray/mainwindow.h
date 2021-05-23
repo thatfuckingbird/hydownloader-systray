@@ -104,7 +104,9 @@ private:
     QAction* unarchiveSelectedURLsAction = nullptr;
     QAction* resumeSelectedSubsAction = nullptr;
     QAction* unarchiveSelectedSubChecksAction = nullptr;
-    HyDownloaderConnection* connection = nullptr;
+    QAction* retryAndForceOverwriteURLAction = nullptr;
+    QHash<QString, HyDownloaderConnection*> connections;
+    HyDownloaderConnection* currentConnection = nullptr;
     HyDownloaderLogModel* logModel = nullptr;
     HyDownloaderSingleURLQueueModel* urlModel = nullptr;
     HyDownloaderSubscriptionModel* subModel = nullptr;
@@ -115,6 +117,10 @@ private:
     QSortFilterProxyModel* subCheckFilterModel = nullptr;
     void setIcon(const QIcon& icon);
     void launchAddURLsDialog(bool paused);
+    QToolButton* menuButton = nullptr;
+    QStringList instanceNames;
+    QMenu* instanceSwitchMenu = nullptr;
+    QActionGroup* instanceSwitchActionGroup = nullptr;
 
 protected:
     void closeEvent(QCloseEvent* event) override;

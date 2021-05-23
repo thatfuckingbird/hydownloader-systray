@@ -32,6 +32,11 @@ HyDownloaderConnection::HyDownloaderConnection(QObject* parent) :
     connect(this->m_nam, &QNetworkAccessManager::sslErrors, this, &HyDownloaderConnection::sslErrors);
 }
 
+bool HyDownloaderConnection::enabled() const
+{
+    return m_enabled;
+}
+
 void HyDownloaderConnection::setAPIURL(const QString& url)
 {
     m_apiURL = url;
@@ -82,8 +87,16 @@ int HyDownloaderConnection::transferTimeout() const
     return m_nam->transferTimeout();
 }
 
+void HyDownloaderConnection::setEnabled(bool enabled)
+{
+    if(m_enabled != enabled) {
+        m_enabled = enabled;
+        emit enabledChanged(m_enabled);
+    }
+}
 uint64_t HyDownloaderConnection::requestStaticData(QString filePath)
 {
+    if(!m_enabled) return 0;
     if(!filePath.startsWith("/")) filePath = "/" + filePath;
     auto reply = get(filePath, {});
     reply->setProperty("requestType", QVariant::fromValue(RequestType::StaticData));
@@ -92,6 +105,7 @@ uint64_t HyDownloaderConnection::requestStaticData(QString filePath)
 
 uint64_t HyDownloaderConnection::requestStatusInformation()
 {
+    if(!m_enabled) return 0;
     auto reply = post("/get_status_info", {});
     reply->setProperty("requestType", QVariant::fromValue(RequestType::StatusInformation));
     return reply->property("requestID").toULongLong();
@@ -99,6 +113,7 @@ uint64_t HyDownloaderConnection::requestStatusInformation()
 
 uint64_t HyDownloaderConnection::requestSubscriptionData()
 {
+    if(!m_enabled) return 0;
     auto reply = post("/get_subscriptions", {});
     reply->setProperty("requestType", QVariant::fromValue(RequestType::SubscriptionData));
     return reply->property("requestID").toULongLong();
@@ -106,6 +121,7 @@ uint64_t HyDownloaderConnection::requestSubscriptionData()
 
 uint64_t HyDownloaderConnection::requestSubscriptionChecksData(int subscriptionID, bool showArchived)
 {
+    if(!m_enabled) return 0;
     QJsonObject obj;
     obj["subscription_id"] = subscriptionID;
     obj["archived"] = showArchived;
@@ -116,6 +132,7 @@ uint64_t HyDownloaderConnection::requestSubscriptionChecksData(int subscriptionI
 
 uint64_t HyDownloaderConnection::requestSingleURLQueueData(bool showArchived)
 {
+    if(!m_enabled) return 0;
     QJsonObject obj;
     obj["archived"] = showArchived;
     auto reply = post("/get_queued_urls", QJsonDocument{obj});
@@ -125,12 +142,14 @@ uint64_t HyDownloaderConnection::requestSingleURLQueueData(bool showArchived)
 
 uint64_t HyDownloaderConnection::requestAPIVersion()
 {
+    if(!m_enabled) return 0;
     auto reply = post("/api_version", {});
     return reply->property("requestID").toULongLong();
 }
 
 uint64_t HyDownloaderConnection::deleteURLs(const QVector<int>& ids)
 {
+    if(!m_enabled) return 0;
     QJsonArray array;
     for(const auto id: ids) array.push_back(id);
     QJsonObject obj;
@@ -140,6 +159,7 @@ uint64_t HyDownloaderConnection::deleteURLs(const QVector<int>& ids)
 
 uint64_t HyDownloaderConnection::deleteSubscriptions(const QVector<int>& ids)
 {
+    if(!m_enabled) return 0;
     QJsonArray array;
     for(const auto id: ids) array.push_back(id);
     QJsonObject obj;
@@ -149,41 +169,49 @@ uint64_t HyDownloaderConnection::deleteSubscriptions(const QVector<int>& ids)
 
 uint64_t HyDownloaderConnection::addOrUpdateURLs(const QJsonArray& data)
 {
+    if(!m_enabled) return 0;
     return post("/add_or_update_urls", QJsonDocument{data})->property("requestID").toULongLong();
 }
 
 uint64_t HyDownloaderConnection::addOrUpdateSubscriptions(const QJsonArray& data)
 {
+    if(!m_enabled) return 0;
     return post("/add_or_update_subscriptions", QJsonDocument{data})->property("requestID").toULongLong();
 }
 
 uint64_t HyDownloaderConnection::addOrUpdateSubscriptionChecks(const QJsonArray& data)
 {
+    if(!m_enabled) return 0;
     return post("/add_or_update_subscription_checks", QJsonDocument{data})->property("requestID").toULongLong();
 }
 
 uint64_t HyDownloaderConnection::pauseSubscriptions()
 {
+    if(!m_enabled) return 0;
     return post("/pause_subscriptions", {})->property("requestID").toULongLong();
 }
 
 uint64_t HyDownloaderConnection::resumeSubscriptions()
 {
+    if(!m_enabled) return 0;
     return post("/resume_subscriptions", {})->property("requestID").toULongLong();
 }
 
 uint64_t HyDownloaderConnection::pauseSingleURLQueue()
 {
+    if(!m_enabled) return 0;
     return post("/pause_single_urls", {})->property("requestID").toULongLong();
 }
 
 uint64_t HyDownloaderConnection::resumeSingleURLQueue()
 {
+    if(!m_enabled) return 0;
     return post("/resume_single_urls", {})->property("requestID").toULongLong();
 }
 
 uint64_t HyDownloaderConnection::runTests(const QStringList& sites)
 {
+    if(!m_enabled) return 0;
     QJsonObject obj;
     obj["sites"] = sites.join(",");
     return post("/run_tests", QJsonDocument{obj})->property("requestID").toULongLong();
@@ -191,6 +219,7 @@ uint64_t HyDownloaderConnection::runTests(const QStringList& sites)
 
 uint64_t HyDownloaderConnection::runReport(bool verbose)
 {
+    if(!m_enabled) return 0;
     QJsonObject obj;
     obj["verbose"] = verbose;
     return post("/run_report", QJsonDocument{obj})->property("requestID").toULongLong();
@@ -198,6 +227,7 @@ uint64_t HyDownloaderConnection::runReport(bool verbose)
 
 void HyDownloaderConnection::shutdown()
 {
+    if(!m_enabled) return;
     post("/shutdown", {});
 }
 

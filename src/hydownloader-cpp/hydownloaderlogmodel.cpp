@@ -35,6 +35,7 @@ void HyDownloaderLogModel::setConnection(HyDownloaderConnection* connection)
     m_connection = connection;
     connect(m_connection, &HyDownloaderConnection::staticDataReceived, this, &HyDownloaderLogModel::handleStaticData);
     connect(m_connection, &HyDownloaderConnection::networkError, this, &HyDownloaderLogModel::handleNetworkError);
+    clear();
     emit statusTextChanged(m_statusText);
 }
 

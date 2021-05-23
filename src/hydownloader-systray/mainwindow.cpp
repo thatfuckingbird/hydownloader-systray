@@ -29,6 +29,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QInputDialog>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QToolButton>
+#include <QActionGroup>
 #include "jsonobjectdelegate.h"
 #include "hydownloaderconnection.h"
 #include "hydownloaderlogmodel.h"
@@ -67,28 +69,32 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
 
     settings = new QSettings{settingsFile, QSettings::IniFormat};
 
+    menuButton = new QToolButton{this};
+    menuButton->setText("Menu");
+    ui->mainTabWidget->setCornerWidget(menuButton, Qt::TopRightCorner);
+
     const bool shouldBeVisible = startVisible || settings->value("startVisible").toBool();
 
     QMenu* manageMenu = new QMenu{this};
     manageMenu->setTitle("Management actions");
     pauseSubsAction = manageMenu->addAction("Pause subscriptions");
     connect(pauseSubsAction, &QAction::triggered, [&] {
-        connection->pauseSubscriptions();
+        currentConnection->pauseSubscriptions();
     });
     pauseSingleURLsAction = manageMenu->addAction("Pause single URL downloads");
     connect(pauseSingleURLsAction, &QAction::triggered, [&] {
-        connection->pauseSingleURLQueue();
+        currentConnection->pauseSingleURLQueue();
     });
     manageMenu->addSeparator();
     pauseAllAction = manageMenu->addAction("Pause all");
     connect(pauseAllAction, &QAction::triggered, [&] {
-        connection->pauseSingleURLQueue();
-        connection->pauseSubscriptions();
+        currentConnection->pauseSingleURLQueue();
+        currentConnection->pauseSubscriptions();
     });
     resumeAllAction = manageMenu->addAction("Resume all");
     connect(resumeAllAction, &QAction::triggered, [&] {
-        connection->resumeSingleURLQueue();
-        connection->resumeSubscriptions();
+        currentConnection->resumeSingleURLQueue();
+        currentConnection->resumeSubscriptions();
     });
     manageMenu->addSeparator();
     runTestsAction = manageMenu->addAction("Run download tests...");
@@ -96,61 +102,61 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         bool ok = true;
         QStringList tests = QInputDialog::getText(this, "Run tests", "Tests:", QLineEdit::Normal, settings->value("defaultTests").toString(), &ok).split(",");
         for(auto& str: tests) str = str.trimmed();
-        if(ok && !tests.isEmpty()) connection->runTests(tests);
+        if(ok && !tests.isEmpty()) currentConnection->runTests(tests);
     });
     runReportAction = manageMenu->addAction("Generate report...");
     connect(runReportAction, &QAction::triggered, [&] {
         bool verbose = QMessageBox::question(this, "Report", "Run verbose report?") == QMessageBox::Yes;
-        connection->runReport(verbose);
+        currentConnection->runReport(verbose);
     });
     manageMenu->addSeparator();
     shutdownAction = manageMenu->addAction("Shut down hydownloader");
     connect(shutdownAction, &QAction::triggered, [&] {
-        connection->shutdown();
+        currentConnection->shutdown();
     });
 
-    QMenu* trayMenu = new QMenu{this};
-    downloadURLAction = trayMenu->addAction("Download URL");
+    QMenu* mainMenu = new QMenu{this};
+    downloadURLAction = mainMenu->addAction("Download URL");
     connect(downloadURLAction, &QAction::triggered, [&] {
         launchAddURLsDialog(false);
     });
 
-    trayMenu->addSeparator();
-    subscriptionsAction = trayMenu->addAction("Manage subscriptions");
+    mainMenu->addSeparator();
+    subscriptionsAction = mainMenu->addAction("Manage subscriptions");
     connect(subscriptionsAction, &QAction::triggered, [&] {
         ui->mainTabWidget->setCurrentWidget(ui->subsTab);
-        subModel->refresh();
+        if(settings->value("aggressiveUpdates").toBool()) subModel->refresh(false);
         show();
         raise();
     });
-    singleURLQueueAction = trayMenu->addAction("Manage single URL queue");
+    singleURLQueueAction = mainMenu->addAction("Manage single URL queue");
     connect(singleURLQueueAction, &QAction::triggered, [&] {
         ui->mainTabWidget->setCurrentWidget(ui->singleURLsTab);
-        urlModel->refresh();
+        if(settings->value("aggressiveUpdates").toBool()) urlModel->refresh(false);
         show();
         raise();
     });
-    checksAction = trayMenu->addAction("Review subscription checks");
+    checksAction = mainMenu->addAction("Review subscription checks");
     connect(checksAction, &QAction::triggered, [&] {
         ui->mainTabWidget->setCurrentWidget(ui->subChecksTab);
-        subCheckModel->refresh();
+        if(settings->value("aggressiveUpdates").toBool()) subCheckModel->refresh(false);
         show();
         raise();
     });
-    logsAction = trayMenu->addAction("Review logs");
+    logsAction = mainMenu->addAction("Review logs");
     connect(logsAction, &QAction::triggered, [&] {
         ui->mainTabWidget->setCurrentWidget(ui->logsTab);
-        logModel->refresh();
+        if(settings->value("aggressiveUpdates").toBool()) logModel->refresh();
         show();
         raise();
     });
-    trayMenu->addSeparator();
-    trayMenu->addMenu(manageMenu);
-    trayMenu->addSeparator();
-    quitAction = trayMenu->addAction("Quit");
+    mainMenu->addSeparator();
+    mainMenu->addMenu(manageMenu);
+    mainMenu->addSeparator();
+    quitAction = mainMenu->addAction("Quit");
     connect(quitAction, &QAction::triggered, QApplication::instance(), &QApplication::quit);
 
-    trayIcon->setContextMenu(trayMenu);
+    trayIcon->setContextMenu(mainMenu);
     setIcon(QIcon{drawSystrayIcon({Qt::gray})});
     trayIcon->show();
     connect(trayIcon, &QSystemTrayIcon::activated, [&] {
@@ -161,11 +167,110 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
             raise();
         }
     });
+    menuButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    menuButton->setMenu(mainMenu);
+    menuButton->setPopupMode(QToolButton::InstantPopup);
 
-    connection = new HyDownloaderConnection{this};
-    connection->setAccessKey(settings->value("accessKey").toString());
-    connection->setAPIURL(settings->value("apiURL").toString());
-    connection->setCertificateVerificationEnabled(false);
+    statusUpdateTimer = new QTimer{this};
+
+    instanceNames = settings->value("instanceNames").toStringList();
+    auto accessKeys = settings->value("accessKey").toStringList();
+    auto apiURLs = settings->value("apiURL").toStringList();
+    bool err = instanceNames.isEmpty();
+    for(int i = 0; i < instanceNames.size(); ++i) {
+        auto connection = new HyDownloaderConnection{this};
+        connection->setCertificateVerificationEnabled(false);
+        connection->setEnabled(false);
+        connections[instanceNames[i]] = connection;
+
+        connect(connection, &HyDownloaderConnection::networkError, [&](std::uint64_t, int status, QNetworkReply::NetworkError, const QString& errorText) {
+            lastUpdateTime = QTime::currentTime();
+            if(status == 404) return; //expected, if requesting logs that were not created yet
+            setStatusText(HyDownloaderLogModel::LogLevel::Error, QString{"Network error (status %1): %2"}.arg(QString::number(status), errorText));
+            setIcon(QIcon{drawSystrayIcon({Qt::red})});
+        });
+        connect(connection, &HyDownloaderConnection::sslErrors, [&](QNetworkReply*, const QList<QSslError>& errors) {
+            QString errorString;
+            for(const auto& error: errors) {
+                errorString += error.errorString() + "\n";
+            }
+            setStatusText(HyDownloaderLogModel::LogLevel::Error, QString{"SSL errors:\n%1"}.arg(errorString.trimmed()));
+            setIcon(QIcon{drawSystrayIcon({Qt::red})});
+            lastUpdateTime = QTime::currentTime();
+        });
+        connect(connection, &HyDownloaderConnection::statusInformationReceived, [&](std::uint64_t, const QJsonObject& info) {
+            setIcon(QIcon{drawSystrayIcon({statusToColor(info["subscription_worker_status"].toString()),
+                                           queueSizeToColor(info["subscriptions_due"].toInt()),
+                                           statusToColor(info["url_worker_status"].toString()),
+                                           queueSizeToColor(info["urls_queued"].toInt())})});
+            setStatusText(HyDownloaderLogModel::LogLevel::Info, QString{"Subscriptions due: %1, URLs queued: %2\nSubscription worker status: %3\nURL worker status: %4"}.arg(
+              QString::number(info["subscriptions_due"].toInt()),
+              QString::number(info["urls_queued"].toInt()),
+              info["subscription_worker_status"].toString(),
+              info["url_worker_status"].toString()));
+            lastUpdateTime = QTime::currentTime();
+        });
+        connect(connection, &HyDownloaderConnection::replyReceived, [&](std::uint64_t requestID, const QJsonDocument& data){
+            bool openFolder = false;
+            if(viewFolderSubReqs.contains(requestID)) {
+                viewFolderSubReqs.remove(requestID);
+                openFolder = true;
+            }
+            if(viewFolderURLReqs.contains(requestID)) {
+                viewFolderURLReqs.remove(requestID);
+                openFolder = true;
+            }
+            if(openFolder) {
+                QString finalDir;
+                const QJsonArray arr = data.array()[0].toObject()["paths"].toArray();
+                for(const auto& path: arr) {
+                    QDir dir = QFileInfo{path.toString()}.absoluteDir();
+                    if(dir.exists()) {
+                        finalDir = dir.absolutePath();
+                    }
+                }
+                if(finalDir.isEmpty()) {
+                    QMessageBox::warning(this, "Not found", "Could not identify folder!");
+                } else {
+                    QDesktopServices::openUrl(QUrl::fromLocalFile(finalDir));
+                }
+            }
+        });
+
+        connect(statusUpdateTimer, &QTimer::timeout, connection, &HyDownloaderConnection::requestStatusInformation);
+
+        if(i < apiURLs.size()) {
+            connection->setAPIURL(apiURLs[i]);
+        } else {
+            err = true;
+        }
+        if(i < accessKeys.size()) {
+            connection->setAccessKey(accessKeys[i]);
+        } else {
+            err = true;
+        }
+    }
+    if(err) {
+        QMessageBox::critical(this, "Invalid instance configuration", "The number of instance names, API URLs and access keys in the configuration must be the same and you must have at least 1 instance configured!");
+        QApplication::instance()->quit();
+    }
+    if(instanceNames.size() > 1) {
+        instanceSwitchMenu = new QMenu{this};
+        instanceSwitchMenu->setTitle("Active instance");
+        instanceSwitchActionGroup = new QActionGroup{this};
+        instanceSwitchActionGroup->setExclusive(true);
+        for(const auto& instance: instanceNames) {
+            instanceSwitchActionGroup->addAction(instanceSwitchMenu->addAction(QString{"Switch to instance: %1"}.arg(instance), [&, instance]{
+                setCurrentConnection(instance);
+            }))->setCheckable(true);
+        }
+        instanceSwitchActionGroup->actions()[0]->setChecked(true);
+        QAction* before = mainMenu->actions()[0];
+        mainMenu->insertMenu(before, instanceSwitchMenu);
+        mainMenu->insertSeparator(before);
+    } else {
+        ui->instanceLabel->setVisible(false);
+    }
     logModel = new HyDownloaderLogModel{};
     subModel = new HyDownloaderSubscriptionModel{};
     subCheckModel = new HyDownloaderSubscriptionChecksModel{};
@@ -208,41 +313,8 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         ui->currentSubChecksLabel->setText(statusText);
     });
 
-    logModel->setConnection(connection);
-    subModel->setConnection(connection);
-    subCheckModel->setConnection(connection);
-    urlModel->setConnection(connection);
+    setCurrentConnection(instanceNames[0]);
 
-    connect(connection, &HyDownloaderConnection::networkError, [&](std::uint64_t, int status, QNetworkReply::NetworkError, const QString& errorText) {
-        lastUpdateTime = QTime::currentTime();
-        if(status == 404) return; //expected, if requesting logs that were not created yet
-        setStatusText(QString{"Network error (status %1): %2"}.arg(QString::number(status), errorText));
-        setIcon(QIcon{drawSystrayIcon({Qt::red})});
-    });
-    connect(connection, &HyDownloaderConnection::sslErrors, [&](QNetworkReply*, const QList<QSslError>& errors) {
-        QString errorString;
-        for(const auto& error: errors) {
-            errorString += error.errorString() + "\n";
-        }
-        setStatusText(QString{"SSL errors:\n%1"}.arg(errorString.trimmed()));
-        setIcon(QIcon{drawSystrayIcon({Qt::red})});
-        lastUpdateTime = QTime::currentTime();
-    });
-    connect(connection, &HyDownloaderConnection::statusInformationReceived, [&](std::uint64_t, const QJsonObject& info) {
-        setIcon(QIcon{drawSystrayIcon({statusToColor(info["subscription_worker_status"].toString()),
-                                       queueSizeToColor(info["subscriptions_due"].toInt()),
-                                       statusToColor(info["url_worker_status"].toString()),
-                                       queueSizeToColor(info["urls_queued"].toInt())})});
-        setStatusText(QString{"Subscriptions due: %1, URLs queued: %2\nSubscription worker status: %3\nURL worker status: %4"}.arg(
-          QString::number(info["subscriptions_due"].toInt()),
-          QString::number(info["urls_queued"].toInt()),
-          info["subscription_worker_status"].toString(),
-          info["url_worker_status"].toString()));
-        lastUpdateTime = QTime::currentTime();
-    });
-
-    statusUpdateTimer = new QTimer{this};
-    connect(statusUpdateTimer, &QTimer::timeout, connection, &HyDownloaderConnection::requestStatusInformation);
     statusUpdateTimer->setInterval(settings->value("updateInterval").toInt());
     statusUpdateTimer->start();
 
@@ -447,6 +519,22 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::setCurrentConnection(const QString &id)
+{
+    if(currentConnection) {
+        currentConnection->setEnabled(false);
+    }
+    ui->instanceLabel->setText(id);
+    currentConnection = connections[id];
+    currentConnection->setEnabled(true);
+    logModel->setConnection(currentConnection);
+    subModel->setConnection(currentConnection);
+    subModel->refresh();
+    subCheckModel->setConnection(currentConnection);
+    urlModel->setConnection(currentConnection);
+    urlModel->refresh();
+}
+
 void MainWindow::on_logFilterLineEdit_textEdited(const QString& arg1)
 {
     logFilterModel->setFilterRegularExpression(arg1);
@@ -506,7 +594,7 @@ void MainWindow::on_deleteSelectedSubsButton_clicked()
     auto ids = subModel->getIDs(indices);
     if(ids.isEmpty()) return;
     if(QMessageBox::question(this, "Delete subscriptions", QString{"Are you sure you want to delete the %1 selected subscriptions?"}.arg(QString::number(ids.size()))) == QMessageBox::Yes) {
-        connection->deleteSubscriptions(ids);
+        currentConnection->deleteSubscriptions(ids);
     }
 }
 
@@ -526,7 +614,7 @@ void MainWindow::on_addSubButton_clicked()
     newSub["paused"] = true;
     newSub["check_interval"] = checkHours * 3600;
     QJsonArray arr = {newSub};
-    connection->addOrUpdateSubscriptions(arr);
+    currentConnection->addOrUpdateSubscriptions(arr);
     subModel->refresh();
 }
 
@@ -557,7 +645,7 @@ void MainWindow::on_deleteSelectedURLsButton_clicked()
     auto ids = urlModel->getIDs(indices);
     if(ids.isEmpty()) return;
     if(QMessageBox::question(this, "Delete URLs", QString{"Are you sure you want to delete the %1 selected URLs?"}.arg(QString::number(ids.size()))) == QMessageBox::Yes) {
-        connection->deleteURLs(ids);
+        currentConnection->deleteURLs(ids);
     }
 }
 
@@ -615,8 +703,8 @@ void MainWindow::launchAddURLsDialog(bool paused)
             arr.append(newURL);
         }
         if(arr.size()) {
-            connection->addOrUpdateURLs(arr);
-            urlModel->refresh();
+            currentConnection->addOrUpdateURLs(arr);
+            urlModel->refresh(false);
         }
     }
 }
@@ -629,9 +717,10 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::showEvent(QShowEvent*)
 {
-    if(connection) {
-        urlModel->refresh();
-        subModel->refresh();
+    if(currentConnection && settings->value("aggressiveUpdates").toBool()) {
+        urlModel->refresh(false);
+        subModel->refresh(false);
+        subCheckModel->refresh(false);
         logModel->refresh();
     }
 }

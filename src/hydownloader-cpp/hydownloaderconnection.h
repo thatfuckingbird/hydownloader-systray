@@ -40,6 +40,8 @@ public:
         APIVersion
     };
     Q_ENUM(RequestType)
+    Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
+    Q_INVOKABLE bool enabled() const;
 
 public slots:
     void setAPIURL(const QString& url);
@@ -52,6 +54,7 @@ public slots:
     bool isCertificateVerificationEnabled() const;
     void setTransferTimeout(int timeout);
     int transferTimeout() const;
+    void setEnabled(bool enabled);
     std::uint64_t requestStaticData(QString filePath);
     std::uint64_t requestStatusInformation();
     std::uint64_t requestSubscriptionData();
@@ -81,6 +84,7 @@ signals:
     void subscriptionChecksDataReceived(std::uint64_t requestID, const QJsonArray& data);
     void apiVersionReceived(std::uint64_t requestID, int version);
     void replyReceived(std::uint64_t requestID, const QJsonObject& data);
+    void enabledChanged(bool);
 
 private slots:
     void handleNetworkReplyFinished(QNetworkReply* reply);
@@ -94,4 +98,5 @@ private:
     QString m_accessKey;
     std::atomic_uint64_t m_requestIDCounter = 0;
     QNetworkReply* setRequestID(QNetworkReply* reply);
+    bool m_enabled = true;
 };
