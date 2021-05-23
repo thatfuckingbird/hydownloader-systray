@@ -17,8 +17,8 @@ qt_add_executable(hydownloader-systray
     src/hydownloader-systray/main.cpp
     src/hydownloader-systray/mainwindow.cpp
     src/hydownloader-systray/mainwindow.h
-    src/hydownloader-systray/datetimeformatdelegate.cpp
-    src/hydownloader-systray/datetimeformatdelegate.h
+    src/hydownloader-systray/jsonobjectdelegate.cpp
+    src/hydownloader-systray/jsonobjectdelegate.h
     src/hydownloader-systray/mainwindow.ui
     src/hydownloader-systray/addurlsdialog.cpp
     src/hydownloader-systray/addurlsdialog.h

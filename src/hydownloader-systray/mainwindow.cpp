@@ -28,7 +28,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QShortcut>
 #include <QInputDialog>
 #include <QCloseEvent>
-#include "datetimeformatdelegate.h"
+#include <QDesktopServices>
+#include "jsonobjectdelegate.h"
 #include "hydownloaderconnection.h"
 #include "hydownloaderlogmodel.h"
 #include "hydownloadersubscriptionmodel.h"
@@ -174,7 +175,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     logFilterModel->setSourceModel(logModel);
     logFilterModel->setFilterKeyColumn(-1);
     ui->logTableView->setModel(logFilterModel);
-    ui->logTableView->setItemDelegate(new DateTimeFormatDelegate{});
+    ui->logTableView->setItemDelegate(new JSONObjectDelegate{});
     connect(logModel, &QAbstractTableModel::rowsInserted, [&] {
         ui->logTableView->scrollToBottom();
     });
@@ -183,19 +184,21 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     urlFilterModel->setSourceModel(urlModel);
     urlFilterModel->setFilterKeyColumn(-1);
     ui->urlsTableView->setModel(urlFilterModel);
-    ui->urlsTableView->setItemDelegate(new DateTimeFormatDelegate{});
+    ui->urlsTableView->setItemDelegate(new JSONObjectDelegate{});
 
     subFilterModel = new QSortFilterProxyModel{};
     subFilterModel->setSourceModel(subModel);
     subFilterModel->setFilterKeyColumn(-1);
     ui->subTableView->setModel(subFilterModel);
-    ui->subTableView->setItemDelegate(new DateTimeFormatDelegate{});
+    auto subDelegate = new JSONObjectDelegate{};
+    subDelegate->setItemListForColumn(1, settings->value("defaultDownloaders").toStringList());
+    ui->subTableView->setItemDelegate(subDelegate);
 
     subCheckFilterModel = new QSortFilterProxyModel{};
     subCheckFilterModel->setSourceModel(subCheckModel);
     subCheckFilterModel->setFilterKeyColumn(-1);
     ui->subCheckTableView->setModel(subCheckFilterModel);
-    ui->subCheckTableView->setItemDelegate(new DateTimeFormatDelegate{});
+    ui->subCheckTableView->setItemDelegate(new JSONObjectDelegate{});
 
     connect(logModel, &HyDownloaderLogModel::statusTextChanged, [&](const QString& statusText) {
         ui->currentLogLabel->setText(statusText);

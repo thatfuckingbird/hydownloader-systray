@@ -20,13 +20,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <QStyledItemDelegate>
 
-class DateTimeFormatDelegate : public QStyledItemDelegate
+class JSONObjectDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
-    explicit DateTimeFormatDelegate(QObject* parent = nullptr) :
-        QStyledItemDelegate(parent) {}
+    explicit JSONObjectDelegate(QObject* parent = nullptr) : QStyledItemDelegate(parent) {}
     QString displayText(const QVariant& value, const QLocale& locale) const override;
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    void setItemListForColumn(int column, const QStringList& items);
+
+private:
+    QHash<int, QStringList> itemLists;
 };
