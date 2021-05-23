@@ -417,7 +417,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     ui->archiveSubChecksButton->setMenu(archiveSubChecksMenu);
 
     QMenu* retryURLsMenu = new QMenu{this};
-    retryURLsMenu->addAction("Retry and force overwrite", [&] {
+    retryAndForceOverwriteURLAction = retryURLsMenu->addAction("Retry and force overwrite", [&] {
         auto indices = ui->urlsTableView->selectionModel()->selectedRows();
         QJsonArray rowData;
         for(auto& index: indices) {
@@ -478,6 +478,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
             }
         }
         popup.addAction("Retry", ui->retryURLsButton, &QToolButton::click);
+        popup.addAction("Retry and force overwrite", retryAndForceOverwriteURLAction, &QAction::trigger);
         popup.addAction("Pause", ui->pauseURLsButton, &QToolButton::click);
         popup.addAction("Resume", this->resumeSelectedURLsAction, &QAction::trigger);
         popup.addSeparator();
