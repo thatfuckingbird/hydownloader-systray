@@ -94,6 +94,27 @@ void HyDownloaderConnection::setEnabled(bool enabled)
         emit enabledChanged(m_enabled);
     }
 }
+
+uint64_t HyDownloaderConnection::requestLastFilesForURLs(const QVector<int> &urlIDs)
+{
+    if(!m_enabled) return 0;
+    QJsonArray array;
+    for(const auto id: urlIDs) array.push_back(id);
+    QJsonObject obj;
+    obj["ids"] = array;
+    return post("/urls_last_files", QJsonDocument{obj})->property("requestID").toULongLong();
+}
+
+uint64_t HyDownloaderConnection::requestLastFilesForSubscriptions(const QVector<int> &subscriptionIDs)
+{
+    if(!m_enabled) return 0;
+    QJsonArray array;
+    for(const auto id: subscriptionIDs) array.push_back(id);
+    QJsonObject obj;
+    obj["ids"] = array;
+    return post("/subscriptions_last_files", QJsonDocument{obj})->property("requestID").toULongLong();
+}
+
 uint64_t HyDownloaderConnection::requestStaticData(QString filePath)
 {
     if(!m_enabled) return 0;
@@ -291,7 +312,7 @@ void HyDownloaderConnection::handleNetworkReplyFinished(QNetworkReply* reply)
                     emit subscriptionChecksDataReceived(reqID, QJsonDocument::fromJson(reply->readAll()).array());
             }
         } else {
-            emit replyReceived(reqID, QJsonDocument::fromJson(reply->readAll()).object());
+            emit replyReceived(reqID, QJsonDocument::fromJson(reply->readAll()));
         }
     } else {
         emit networkError(reqID, statusCode, reply->error(), reply->errorString());

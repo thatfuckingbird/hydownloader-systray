@@ -51,7 +51,7 @@ private:
     QSet<std::uint64_t> m_updateIDs;
 
 private slots:
-    void handleReplyReceived(std::uint64_t requestID, const QJsonObject&);
+    void handleReplyReceived(std::uint64_t requestID, const QJsonDocument&);
 
 protected:
     const ColumnData m_columnData;

@@ -127,7 +127,7 @@ void HyDownloaderJSONObjectListModel::setRowData(const QVector<QModelIndex>& ind
     emit dataChanged(createIndex(minRow, 0), createIndex(maxRow, m_columnData.size() - 1));
 }
 
-void HyDownloaderJSONObjectListModel::handleReplyReceived(uint64_t requestID, const QJsonObject&)
+void HyDownloaderJSONObjectListModel::handleReplyReceived(uint64_t requestID, const QJsonDocument&)
 {
     if(m_updateIDs.contains(requestID)) {
         m_updateIDs.remove(requestID);

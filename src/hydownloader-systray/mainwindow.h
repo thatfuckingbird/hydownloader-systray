@@ -121,6 +121,8 @@ private:
     QStringList instanceNames;
     QMenu* instanceSwitchMenu = nullptr;
     QActionGroup* instanceSwitchActionGroup = nullptr;
+    QSet<std::uint64_t> viewFolderSubReqs;
+    QSet<std::uint64_t> viewFolderURLReqs;
 
 protected:
     void closeEvent(QCloseEvent* event) override;

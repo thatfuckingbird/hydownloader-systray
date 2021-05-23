@@ -24,6 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QSortFilterProxyModel>
 #include <QSslError>
 #include <QJsonObject>
+#include <QJsonDocument>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QInputDialog>
@@ -31,6 +32,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QDesktopServices>
 #include <QToolButton>
 #include <QActionGroup>
+#include <QFileInfo>
+#include <QDir>
 #include "jsonobjectdelegate.h"
 #include "hydownloaderconnection.h"
 #include "hydownloaderlogmodel.h"
@@ -436,7 +439,15 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
             popup.addAction("View log", ui->viewLogForSubButton, &QToolButton::click);
             popup.addAction("View check history", ui->viewChecksForSubButton, &QToolButton::click);
             popup.addSeparator();
+            auto subID = subModel->getIDs({subFilterModel->mapToSource(ui->subTableView->selectionModel()->selectedRows()[0])})[0];
+            if(settings->value("localConnection").toBool()) {
+                popup.addAction("Open folder", [&, subID]{
+                    viewFolderSubReqs.insert(currentConnection->requestLastFilesForSubscriptions({subID}));
+                });
+                popup.addSeparator();
+            }
         }
+
         popup.addAction("Clear last checked time", ui->recheckSubsButton, &QToolButton::click);
         popup.addAction("Pause", ui->pauseSubsButton, &QToolButton::click);
         popup.addAction("Resume", resumeSelectedSubsAction, &QAction::trigger);
@@ -454,6 +465,13 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         if(selectionSize == 1) {
             popup.addAction("View log", ui->viewLogForURLButton, &QToolButton::click);
             popup.addSeparator();
+            auto urlID = urlModel->getIDs({urlFilterModel->mapToSource(ui->urlsTableView->selectionModel()->selectedRows()[0])})[0];
+            if(settings->value("localConnection").toBool()) {
+                popup.addAction("Open folder", [&, urlID]{
+                    viewFolderURLReqs.insert(currentConnection->requestLastFilesForURLs({urlID}));
+                });
+                popup.addSeparator();
+            }
         }
         popup.addAction("Retry", ui->retryURLsButton, &QToolButton::click);
         popup.addAction("Pause", ui->pauseURLsButton, &QToolButton::click);
