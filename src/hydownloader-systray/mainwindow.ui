@@ -69,6 +69,9 @@
           <property name="placeholderText">
            <string>filter...</string>
           </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -214,6 +217,9 @@
          <widget class="QLineEdit" name="subFilterLineEdit">
           <property name="placeholderText">
            <string>filter...</string>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -361,6 +367,9 @@
           <property name="placeholderText">
            <string>filter...</string>
           </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -483,6 +492,9 @@
          <widget class="QLineEdit" name="logFilterLineEdit">
           <property name="placeholderText">
            <string>filter...</string>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
