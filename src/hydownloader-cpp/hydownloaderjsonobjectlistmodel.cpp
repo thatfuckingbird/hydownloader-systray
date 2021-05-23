@@ -135,7 +135,7 @@ void HyDownloaderJSONObjectListModel::handleReplyReceived(uint64_t requestID, co
     }
 }
 
-void HyDownloaderJSONObjectListModel::updateFromRowData(const QJsonArray &arr)
+void HyDownloaderJSONObjectListModel::updateFromRowData(const QJsonArray& arr)
 {
     if(arr.isEmpty()) {
         clear();

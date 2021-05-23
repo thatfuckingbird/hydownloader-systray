@@ -207,13 +207,13 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
                                            statusToColor(info["url_worker_status"].toString()),
                                            queueSizeToColor(info["urls_queued"].toInt())})});
             setStatusText(HyDownloaderLogModel::LogLevel::Info, QString{"Subscriptions due: %1, URLs queued: %2\nSubscription worker status: %3\nURL worker status: %4"}.arg(
-              QString::number(info["subscriptions_due"].toInt()),
-              QString::number(info["urls_queued"].toInt()),
-              info["subscription_worker_status"].toString(),
-              info["url_worker_status"].toString()));
+                                                                  QString::number(info["subscriptions_due"].toInt()),
+                                                                  QString::number(info["urls_queued"].toInt()),
+                                                                  info["subscription_worker_status"].toString(),
+                                                                  info["url_worker_status"].toString()));
             lastUpdateTime = QTime::currentTime();
         });
-        connect(connection, &HyDownloaderConnection::replyReceived, [&](std::uint64_t requestID, const QJsonDocument& data){
+        connect(connection, &HyDownloaderConnection::replyReceived, [&](std::uint64_t requestID, const QJsonDocument& data) {
             bool openFolder = false;
             if(viewFolderSubReqs.contains(requestID)) {
                 viewFolderSubReqs.remove(requestID);
@@ -263,9 +263,10 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         instanceSwitchActionGroup = new QActionGroup{this};
         instanceSwitchActionGroup->setExclusive(true);
         for(const auto& instance: instanceNames) {
-            instanceSwitchActionGroup->addAction(instanceSwitchMenu->addAction(QString{"Switch to instance: %1"}.arg(instance), [&, instance]{
-                setCurrentConnection(instance);
-            }))->setCheckable(true);
+            instanceSwitchActionGroup->addAction(instanceSwitchMenu->addAction(QString{"Switch to instance: %1"}.arg(instance), [&, instance] {
+                                         setCurrentConnection(instance);
+                                     }))
+              ->setCheckable(true);
         }
         instanceSwitchActionGroup->actions()[0]->setChecked(true);
         QAction* before = mainMenu->actions()[0];
@@ -445,7 +446,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
             popup.addSeparator();
             auto subID = subModel->getIDs({subFilterModel->mapToSource(ui->subTableView->selectionModel()->selectedRows()[0])})[0];
             if(settings->value("localConnection").toBool()) {
-                popup.addAction("Open folder", [&, subID]{
+                popup.addAction("Open folder", [&, subID] {
                     viewFolderSubReqs.insert(currentConnection->requestLastFilesForSubscriptions({subID}));
                 });
                 popup.addSeparator();
@@ -471,7 +472,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
             popup.addSeparator();
             auto urlID = urlModel->getIDs({urlFilterModel->mapToSource(ui->urlsTableView->selectionModel()->selectedRows()[0])})[0];
             if(settings->value("localConnection").toBool()) {
-                popup.addAction("Open folder", [&, urlID]{
+                popup.addAction("Open folder", [&, urlID] {
                     viewFolderURLReqs.insert(currentConnection->requestLastFilesForURLs({urlID}));
                 });
                 popup.addSeparator();
@@ -553,9 +554,8 @@ void MainWindow::updateSubCountInfoAndButtons()
     ui->viewChecksForSubButton->setEnabled(selectionSize == 1);
     ui->pauseSubsButton->setEnabled(selectionSize > 0);
     ui->subsLabel->setText(QString{"%1 selected, %2 total loaded subscriptions"}.arg(
-                                          QLocale{}.toString(selectionSize),
-                                          QLocale{}.toString(subModel->rowCount({}))
-                                          ));
+      QLocale{}.toString(selectionSize),
+      QLocale{}.toString(subModel->rowCount({}))));
 }
 
 void MainWindow::updateURLCountInfoAndButtons()
@@ -567,9 +567,8 @@ void MainWindow::updateURLCountInfoAndButtons()
     ui->viewLogForURLButton->setEnabled(selectionSize == 1);
     ui->retryURLsButton->setEnabled(selectionSize > 0);
     ui->urlsLabel->setText(QString{"%1 selected, %2 total loaded URLs"}.arg(
-                                          QLocale{}.toString(selectionSize),
-                                          QLocale{}.toString(urlModel->rowCount({}))
-                                          ));
+      QLocale{}.toString(selectionSize),
+      QLocale{}.toString(urlModel->rowCount({}))));
 }
 
 void MainWindow::updateSubCheckCountInfoAndButtons()
@@ -577,20 +576,18 @@ void MainWindow::updateSubCheckCountInfoAndButtons()
     const int selectionSize = ui->subCheckTableView->selectionModel()->selectedRows().size();
     ui->archiveSubChecksButton->setEnabled(selectionSize > 0);
     ui->subChecksLabel->setText(QString{"%1 selected, %2 total loaded subscription checks"}.arg(
-                                          QLocale{}.toString(selectionSize),
-                                          QLocale{}.toString(subCheckModel->rowCount({}))
-                                          ));
+      QLocale{}.toString(selectionSize),
+      QLocale{}.toString(subCheckModel->rowCount({}))));
 }
 
 void MainWindow::updateLogCountInfo()
 {
     ui->logSelectionLabel->setText(QString{"%1 selected, %2 total loaded log entries"}.arg(
-                                          QLocale{}.toString(ui->logTableView->selectionModel()->selectedRows().size()),
-                                          QLocale{}.toString(logModel->rowCount({}))
-                                       ));
+      QLocale{}.toString(ui->logTableView->selectionModel()->selectedRows().size()),
+      QLocale{}.toString(logModel->rowCount({}))));
 }
 
-void MainWindow::setCurrentConnection(const QString &id)
+void MainWindow::setCurrentConnection(const QString& id)
 {
     if(currentConnection) {
         currentConnection->setEnabled(false);

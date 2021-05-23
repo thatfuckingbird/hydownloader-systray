@@ -29,7 +29,7 @@ HyDownloaderSubscriptionChecksModel::HyDownloaderSubscriptionChecksModel() :
        {"new_files", "New files", false, toVariant, &QJsonValue::fromVariant},
        {"already_seen_files", "Already seen files", false, toVariant, &QJsonValue::fromVariant},
        {"archived", "Archived", true, toBool, fromBool}},
-        "rowid"},
+      "rowid"},
     m_statusText{"No data loaded"} {}
 
 void HyDownloaderSubscriptionChecksModel::setUpConnections(HyDownloaderConnection* oldConnection)

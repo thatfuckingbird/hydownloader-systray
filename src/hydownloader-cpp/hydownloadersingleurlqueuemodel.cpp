@@ -40,7 +40,7 @@ HyDownloaderSingleURLQueueModel::HyDownloaderSingleURLQueueModel() :
        {"already_seen_files", "Already seen files", false, toVariant, &QJsonValue::fromVariant},
        {"comment", "Comment", true, toVariant, &QJsonValue::fromVariant},
        {"archived", "Archived", true, toBool, fromBool}},
-        "id"} {}
+      "id"} {}
 
 void HyDownloaderSingleURLQueueModel::setUpConnections(HyDownloaderConnection* oldConnection)
 {

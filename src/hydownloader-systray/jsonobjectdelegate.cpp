@@ -35,10 +35,10 @@ QString JSONObjectDelegate::displayText(const QVariant& value, const QLocale& lo
 QWidget* JSONObjectDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     if(!itemLists.contains(index.column())) {
-    QWidget* widget = QStyledItemDelegate::createEditor(parent, option, index);
-    if(strcmp(widget->metaObject()->className(), "QDateTimeEdit") == 0)
-        dynamic_cast<QDateTimeEdit*>(widget)->setDisplayFormat("yyyy-MM-dd hh:mm:ss");
-    return widget;
+        QWidget* widget = QStyledItemDelegate::createEditor(parent, option, index);
+        if(strcmp(widget->metaObject()->className(), "QDateTimeEdit") == 0)
+            dynamic_cast<QDateTimeEdit*>(widget)->setDisplayFormat("yyyy-MM-dd hh:mm:ss");
+        return widget;
     } else {
         QComboBox* comboBox = new QComboBox{parent};
         comboBox->addItems(itemLists[index.column()]);
@@ -46,7 +46,7 @@ QWidget* JSONObjectDelegate::createEditor(QWidget* parent, const QStyleOptionVie
     }
 }
 
-void JSONObjectDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void JSONObjectDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
     QComboBox* comboBox = dynamic_cast<QComboBox*>(editor);
     if(comboBox) {
@@ -56,7 +56,7 @@ void JSONObjectDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     }
 }
 
-void JSONObjectDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+void JSONObjectDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
     QComboBox* comboBox = dynamic_cast<QComboBox*>(editor);
     if(comboBox && comboBox->currentIndex() >= 0 && itemLists.contains(index.column())) {
@@ -66,7 +66,7 @@ void JSONObjectDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     }
 }
 
-void JSONObjectDelegate::setItemListForColumn(int column, const QStringList &items)
+void JSONObjectDelegate::setItemListForColumn(int column, const QStringList& items)
 {
     itemLists[column] = items;
 }

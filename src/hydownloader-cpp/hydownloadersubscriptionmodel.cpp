@@ -36,7 +36,7 @@ HyDownloaderSubscriptionModel::HyDownloaderSubscriptionModel() :
        {"time_created", "Time created", true, toDateTime, fromDateTime},
        {"filter", "Filter", true, toVariant, &QJsonValue::fromVariant},
        {"comment", "Comment", true, toVariant, &QJsonValue::fromVariant}},
-        "id"} {}
+      "id"} {}
 
 void HyDownloaderSubscriptionModel::setUpConnections(HyDownloaderConnection* oldConnection)
 {

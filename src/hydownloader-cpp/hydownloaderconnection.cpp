@@ -95,7 +95,7 @@ void HyDownloaderConnection::setEnabled(bool enabled)
     }
 }
 
-uint64_t HyDownloaderConnection::requestLastFilesForURLs(const QVector<int> &urlIDs)
+uint64_t HyDownloaderConnection::requestLastFilesForURLs(const QVector<int>& urlIDs)
 {
     if(!m_enabled) return 0;
     QJsonArray array;
@@ -105,7 +105,7 @@ uint64_t HyDownloaderConnection::requestLastFilesForURLs(const QVector<int> &url
     return post("/urls_last_files", QJsonDocument{obj})->property("requestID").toULongLong();
 }
 
-uint64_t HyDownloaderConnection::requestLastFilesForSubscriptions(const QVector<int> &subscriptionIDs)
+uint64_t HyDownloaderConnection::requestLastFilesForSubscriptions(const QVector<int>& subscriptionIDs)
 {
     if(!m_enabled) return 0;
     QJsonArray array;

@@ -44,8 +44,8 @@ void HyDownloaderLogModel::loadSubscriptionLog(int id, bool unsupportedURLs)
     if(!m_connection) return;
     clear();
     if(!m_showOnlyLatest) {
-    auto requestID = m_connection->requestStaticData(QString{"logs/subscription-%2-%1gallery-dl-old.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
-    m_receivedData.push_back({requestID, {}});
+        auto requestID = m_connection->requestStaticData(QString{"logs/subscription-%2-%1gallery-dl-old.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
+        m_receivedData.push_back({requestID, {}});
     }
     auto requestID = m_connection->requestStaticData(QString{"logs/subscription-%2-%1gallery-dl-latest.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
     m_receivedData.push_back({requestID, {}});
@@ -76,8 +76,8 @@ void HyDownloaderLogModel::loadSingleURLQueueLog(int id, bool unsupportedURLs)
     if(!m_connection) return;
     clear();
     if(!m_showOnlyLatest) {
-    auto requestID = m_connection->requestStaticData(QString{"logs/single-urls-%2-%1gallery-dl-old.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
-    m_receivedData.push_back({requestID, {}});
+        auto requestID = m_connection->requestStaticData(QString{"logs/single-urls-%2-%1gallery-dl-old.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
+        m_receivedData.push_back({requestID, {}});
     }
     auto requestID = m_connection->requestStaticData(QString{"logs/single-urls-%2-%1gallery-dl-latest.txt"}.arg(unsupportedURLs ? "unsupported-urls-" : "", QString::number(id)));
     m_receivedData.push_back({requestID, {}});
@@ -207,33 +207,33 @@ QVariant HyDownloaderLogModel::headerData(int section, Qt::Orientation orientati
     }
 }
 
-void HyDownloaderLogModel::addStatusLogLine(HyDownloaderLogModel::LogLevel level, const QString &text)
+void HyDownloaderLogModel::addStatusLogLine(HyDownloaderLogModel::LogLevel level, const QString& text)
 {
-        const QString newStatusLine = QString{"[%1] %2"}.arg(QDateTime::currentDateTime().toString(Qt::ISODate), text);
-        if(!m_statusLogLevels.isEmpty() && m_statusLogLevels.last() == level && m_rawStatusLines.last() == text) {
-            m_statusLines.last() = newStatusLine;
-            if(m_lastLoadedLog == LogType::StatusLog) {
-                m_lines.last() = newStatusLine;
-                emit dataChanged(createIndex(m_statusLines.size() - 1, 0), createIndex(m_statusLines.size() - 1, 1));
-            }
-        } else {
-            m_statusLogLevels.append(level);
-            m_rawStatusLines.append(text);
-            m_statusLines.append(newStatusLine);
-            if(m_lastLoadedLog == LogType::StatusLog) {
-                beginInsertRows({}, m_lines.size(), m_lines.size());
-                m_lines.append(m_statusLines.back());
-                m_rawLines.append(m_rawStatusLines.back());
-                m_logLevels.append(m_statusLogLevels.back());
-                endInsertRows();
-            }
+    const QString newStatusLine = QString{"[%1] %2"}.arg(QDateTime::currentDateTime().toString(Qt::ISODate), text);
+    if(!m_statusLogLevels.isEmpty() && m_statusLogLevels.last() == level && m_rawStatusLines.last() == text) {
+        m_statusLines.last() = newStatusLine;
+        if(m_lastLoadedLog == LogType::StatusLog) {
+            m_lines.last() = newStatusLine;
+            emit dataChanged(createIndex(m_statusLines.size() - 1, 0), createIndex(m_statusLines.size() - 1, 1));
         }
-        if(m_statusLines.size() > 20000) {
-            m_statusLines = m_statusLines.mid(10000);
-            m_rawStatusLines = m_rawStatusLines.mid(10000);
-            m_statusLogLevels = m_statusLogLevels.mid(10000);
-            if(m_lastLoadedLog == LogType::StatusLog) refresh();
+    } else {
+        m_statusLogLevels.append(level);
+        m_rawStatusLines.append(text);
+        m_statusLines.append(newStatusLine);
+        if(m_lastLoadedLog == LogType::StatusLog) {
+            beginInsertRows({}, m_lines.size(), m_lines.size());
+            m_lines.append(m_statusLines.back());
+            m_rawLines.append(m_rawStatusLines.back());
+            m_logLevels.append(m_statusLogLevels.back());
+            endInsertRows();
         }
+    }
+    if(m_statusLines.size() > 20000) {
+        m_statusLines = m_statusLines.mid(10000);
+        m_rawStatusLines = m_rawStatusLines.mid(10000);
+        m_statusLogLevels = m_statusLogLevels.mid(10000);
+        if(m_lastLoadedLog == LogType::StatusLog) refresh();
+    }
 }
 
 QString HyDownloaderLogModel::statusText() const
