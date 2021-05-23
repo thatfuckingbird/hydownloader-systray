@@ -62,7 +62,7 @@ int HyDownloaderJSONObjectListModel::rowCount(const QModelIndex& parent) const
 
 QVariant HyDownloaderJSONObjectListModel::data(const QModelIndex& index, int role) const
 {
-    if(index.parent().isValid() || (role != Qt::DisplayRole && role != Qt::EditRole)) return {};
+    if(index.parent().isValid() || (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ToolTipRole)) return {};
 
     const auto& conversionFunction = std::get<3>(m_columnData[index.column()]);
     const auto& key = std::get<0>(m_columnData[index.column()]);

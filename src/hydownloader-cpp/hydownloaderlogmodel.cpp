@@ -143,7 +143,7 @@ int HyDownloaderLogModel::rowCount(const QModelIndex&) const
 
 QVariant HyDownloaderLogModel::data(const QModelIndex& index, int role) const
 {
-    if(index.parent().isValid() || role != Qt::DisplayRole) return {};
+    if(index.parent().isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole)) return {};
 
     switch(index.column()) {
         case 0:
