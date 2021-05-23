@@ -619,13 +619,13 @@ void MainWindow::on_refreshLogButton_clicked()
 void MainWindow::on_loadSubscriptionLogButton_clicked()
 {
     int id = QInputDialog::getInt(this, "Load subscription log", "Subscription ID:", 0, 0);
-    logModel->loadSubscriptionLog(id);
+    if(id > 0) logModel->loadSubscriptionLog(id);
 }
 
 void MainWindow::on_loadSingleURLQueueLogButton_clicked()
 {
     int id = QInputDialog::getInt(this, "Load single URL log", "URL ID:", 0, 0);
-    logModel->loadSingleURLQueueLog(id);
+    if(id > 0) logModel->loadSingleURLQueueLog(id);
 }
 
 void MainWindow::on_loadDaemonLogButton_clicked()
