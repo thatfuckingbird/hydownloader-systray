@@ -35,7 +35,8 @@ HyDownloaderSubscriptionModel::HyDownloaderSubscriptionModel() :
        {"additional_data", "Additional data", true, toVariant, &QJsonValue::fromVariant},
        {"time_created", "Time created", true, toDateTime, fromDateTime},
        {"filter", "Filter", true, toVariant, &QJsonValue::fromVariant},
-       {"comment", "Comment", true, toVariant, &QJsonValue::fromVariant}}} {}
+       {"comment", "Comment", true, toVariant, &QJsonValue::fromVariant}},
+        "id"} {}
 
 void HyDownloaderSubscriptionModel::setUpConnections(HyDownloaderConnection* oldConnection)
 {
@@ -48,17 +49,13 @@ std::uint64_t HyDownloaderSubscriptionModel::addOrUpdateObjects(const QJsonArray
     return m_connection->addOrUpdateSubscriptions(objs);
 }
 
-void HyDownloaderSubscriptionModel::refresh()
+void HyDownloaderSubscriptionModel::refresh(bool full)
 {
-    clear();
+    if(full) clear();
     m_connection->requestSubscriptionData();
 }
 
 void HyDownloaderSubscriptionModel::handleSubscriptionData(uint64_t, const QJsonArray& data)
 {
-    clear();
-    if(data.isEmpty()) return;
-    beginInsertRows({}, 0, data.size() - 1);
-    m_data = data;
-    endInsertRows();
+    updateFromRowData(data);
 }

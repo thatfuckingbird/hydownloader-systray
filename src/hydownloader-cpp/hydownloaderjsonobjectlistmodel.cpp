@@ -130,6 +130,34 @@ void HyDownloaderJSONObjectListModel::handleReplyReceived(uint64_t requestID, co
 {
     if(m_updateIDs.contains(requestID)) {
         m_updateIDs.remove(requestID);
-        refresh();
+        refresh(false);
+    }
+}
+
+void HyDownloaderJSONObjectListModel::updateFromRowData(const QJsonArray &arr)
+{
+    if(arr.isEmpty()) {
+        clear();
+        return;
+    }
+    int commonPrefixLength = 0;
+    for(; commonPrefixLength < arr.size() && commonPrefixLength < m_data.size(); ++commonPrefixLength) {
+        if(arr[commonPrefixLength] != m_data[commonPrefixLength]) break;
+    }
+    int oldDataLength = m_data.size();
+    int newDataLength = arr.size();
+    if(oldDataLength < newDataLength) {
+        beginInsertRows({}, oldDataLength, newDataLength - 1);
+        m_data = arr;
+        endInsertRows();
+    } else if(oldDataLength > newDataLength) {
+        beginRemoveRows({}, newDataLength, oldDataLength - 1);
+        m_data = arr;
+        endRemoveRows();
+    } else {
+        m_data = arr;
+    }
+    if(commonPrefixLength < m_data.size()) {
+        emit dataChanged(createIndex(commonPrefixLength, 0), createIndex(m_data.size() - 1, m_columnData.size() - 1));
     }
 }

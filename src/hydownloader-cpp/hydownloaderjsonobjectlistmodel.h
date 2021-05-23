@@ -30,11 +30,11 @@ class HyDownloaderJSONObjectListModel : public QAbstractListModel
 
 public:
     using ColumnData = QVector<std::tuple<QString, QString, bool, std::function<QVariant(const QJsonValue&)>, std::function<QJsonValue(const QVariant&)>>>;
-    HyDownloaderJSONObjectListModel(ColumnData&& columnData) :
-        m_columnData{columnData} {};
+    HyDownloaderJSONObjectListModel(ColumnData&& columnData, const QString& idColumnName) :
+        m_columnData{columnData}, m_idColumnName{idColumnName} {};
     void setConnection(HyDownloaderConnection* connection);
     virtual void setUpConnections(HyDownloaderConnection* oldConnection) = 0;
-    virtual void refresh() = 0;
+    virtual void refresh(bool full = true) = 0;
     virtual std::uint64_t addOrUpdateObjects(const QJsonArray& objs) = 0;
     QVector<int> getIDs(const QModelIndexList& indices) const;
     virtual void clear();
@@ -55,6 +55,7 @@ private slots:
 
 protected:
     const ColumnData m_columnData;
+    const QString m_idColumnName;
     QJsonArray m_data;
     HyDownloaderConnection* m_connection = nullptr;
     static constexpr auto toVariant = [](const QJsonValue& val) {
@@ -72,4 +73,5 @@ protected:
     static constexpr auto fromDateTime = [](const QVariant& val) {
         return !val.isValid() || val.isNull() ? QJsonValue::fromVariant(val) : static_cast<double>(val.toDateTime().toSecsSinceEpoch());
     };
+    void updateFromRowData(const QJsonArray& arr);
 };

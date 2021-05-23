@@ -39,7 +39,8 @@ HyDownloaderSingleURLQueueModel::HyDownloaderSingleURLQueueModel() :
        {"new_files", "New files", false, toVariant, &QJsonValue::fromVariant},
        {"already_seen_files", "Already seen files", false, toVariant, &QJsonValue::fromVariant},
        {"comment", "Comment", true, toVariant, &QJsonValue::fromVariant},
-       {"archived", "Archived", true, toBool, fromBool}}} {}
+       {"archived", "Archived", true, toBool, fromBool}},
+        "id"} {}
 
 void HyDownloaderSingleURLQueueModel::setUpConnections(HyDownloaderConnection* oldConnection)
 {
@@ -52,9 +53,9 @@ std::uint64_t HyDownloaderSingleURLQueueModel::addOrUpdateObjects(const QJsonArr
     return m_connection->addOrUpdateURLs(objs);
 }
 
-void HyDownloaderSingleURLQueueModel::refresh()
+void HyDownloaderSingleURLQueueModel::refresh(bool full)
 {
-    clear();
+    if(full) clear();
     m_connection->requestSingleURLQueueData(m_showArchived);
 }
 
@@ -73,9 +74,5 @@ void HyDownloaderSingleURLQueueModel::setShowArchived(bool show)
 
 void HyDownloaderSingleURLQueueModel::handleSingleURLQueueData(uint64_t, const QJsonArray& data)
 {
-    clear();
-    if(data.isEmpty()) return;
-    beginInsertRows({}, 0, data.size() - 1);
-    m_data = data;
-    endInsertRows();
+    updateFromRowData(data);
 }

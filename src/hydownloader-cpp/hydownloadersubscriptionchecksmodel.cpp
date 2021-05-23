@@ -28,7 +28,8 @@ HyDownloaderSubscriptionChecksModel::HyDownloaderSubscriptionChecksModel() :
        {"status", "Result status", false, toVariant, &QJsonValue::fromVariant},
        {"new_files", "New files", false, toVariant, &QJsonValue::fromVariant},
        {"already_seen_files", "Already seen files", false, toVariant, &QJsonValue::fromVariant},
-       {"archived", "Archived", true, toBool, fromBool}}},
+       {"archived", "Archived", true, toBool, fromBool}},
+        "rowid"},
     m_statusText{"No data loaded"} {}
 
 void HyDownloaderSubscriptionChecksModel::setUpConnections(HyDownloaderConnection* oldConnection)
@@ -43,9 +44,9 @@ std::uint64_t HyDownloaderSubscriptionChecksModel::addOrUpdateObjects(const QJso
     return m_connection->addOrUpdateSubscriptionChecks(objs);
 }
 
-void HyDownloaderSubscriptionChecksModel::refresh()
+void HyDownloaderSubscriptionChecksModel::refresh(bool full)
 {
-    clear();
+    if(full) clear();
     if(m_lastRequestedID >= 0) {
         m_connection->requestSubscriptionChecksData(m_lastRequestedID, m_showArchived);
         m_statusText = "Loading subscription check history...";
@@ -86,17 +87,11 @@ void HyDownloaderSubscriptionChecksModel::setShowArchived(bool show)
 
 void HyDownloaderSubscriptionChecksModel::handleSubscriptionChecksData(uint64_t, const QJsonArray& data)
 {
-    clear();
-
     if(m_lastRequestedID) {
         m_statusText = QString{"Subscription check history for subscription %1"}.arg(m_lastRequestedID);
     } else {
         m_statusText = "Subscription check history for all subscriptions";
     }
     emit statusTextChanged(m_statusText);
-
-    if(data.isEmpty()) return;
-    beginInsertRows({}, 0, data.size() - 1);
-    m_data = data;
-    endInsertRows();
+    updateFromRowData(data);
 }

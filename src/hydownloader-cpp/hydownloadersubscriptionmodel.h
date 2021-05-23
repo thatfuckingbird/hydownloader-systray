@@ -30,7 +30,7 @@ public:
     HyDownloaderSubscriptionModel();
     void setUpConnections(HyDownloaderConnection* oldConnection) override;
     std::uint64_t addOrUpdateObjects(const QJsonArray& objs) override;
-    void refresh() override;
+    void refresh(bool full = true) override;
 
 private slots:
     void handleSubscriptionData(std::uint64_t requestID, const QJsonArray& data);

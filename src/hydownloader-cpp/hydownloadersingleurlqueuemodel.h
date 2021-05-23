@@ -31,7 +31,7 @@ public:
     HyDownloaderSingleURLQueueModel();
     void setUpConnections(HyDownloaderConnection* oldConnection) override;
     std::uint64_t addOrUpdateObjects(const QJsonArray& objs) override;
-    void refresh() override;
+    void refresh(bool full = true) override;
 
 public slots:
     bool showArchived() const;
