@@ -78,3 +78,7 @@ ForEachMacros:
   - BOOST_FOREACH
 TabWidth: 4
 UseTab: Never
+#IndentPragmas: true
+#SpaceBeforeCaseColon: false
+#BreakBeforeConceptDeclarations: true
+#IndentRequires: true
