@@ -288,6 +288,13 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     subModel = new HyDownloaderSubscriptionModel{};
     subCheckModel = new HyDownloaderSubscriptionChecksModel{};
     urlModel = new HyDownloaderSingleURLQueueModel{};
+    if(settings->value("aggressiveUpdates").toBool()) {
+        connect(statusUpdateTimer, &QTimer::timeout, [&] {
+            urlModel->refresh(false);
+            subModel->refresh(false);
+            subCheckModel->refresh(false);
+        });
+    }
 
     logFilterModel = new QSortFilterProxyModel{};
     logFilterModel->setSourceModel(logModel);
@@ -336,11 +343,6 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         if(lastUpdateTime.secsTo(QTime::currentTime()) >= 30) {
             setStatusText(HyDownloaderLogModel::LogLevel::Error, QString{"No status update received in the past 30 seconds"});
             setIcon(QIcon{drawSystrayIcon({Qt::red})});
-        }
-        if(settings->value("aggressiveUpdates").toBool()) {
-            urlModel->refresh(false);
-            subModel->refresh(false);
-            subCheckModel->refresh(false);
         }
     });
     lastUpdateTime = QTime::currentTime();
