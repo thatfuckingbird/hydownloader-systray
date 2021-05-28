@@ -106,6 +106,8 @@ private:
     QAction* pauseAllAction = nullptr;
     QAction* resumeAllAction = nullptr;
     QAction* shutdownAction = nullptr;
+    QAction* abortSubAction = nullptr;
+    QAction* abortURLAction = nullptr;
     QAction* runTestsAction = nullptr;
     QAction* runReportAction = nullptr;
     QTimer* statusUpdateTimer = nullptr;

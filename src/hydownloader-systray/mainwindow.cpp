@@ -100,6 +100,15 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         currentConnection->resumeSubscriptions();
     });
     manageMenu->addSeparator();
+    abortSubAction = manageMenu->addAction("Force abort running subscription");
+    connect(abortSubAction, &QAction::triggered, [&] {
+        currentConnection->stopCurrentSubscription();
+    });
+    abortURLAction = manageMenu->addAction("Force abort running single URL download");
+    connect(abortURLAction, &QAction::triggered, [&] {
+        currentConnection->stopCurrentURL();
+    });
+    manageMenu->addSeparator();
     runTestsAction = manageMenu->addAction("Run download tests...");
     connect(runTestsAction, &QAction::triggered, [&] {
         bool ok = true;

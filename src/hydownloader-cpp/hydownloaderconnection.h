@@ -74,7 +74,10 @@ public slots:
     std::uint64_t resumeSingleURLQueue();
     std::uint64_t runTests(const QStringList& sites);
     std::uint64_t runReport(bool verbose);
+    std::uint64_t stopCurrentSubscription();
+    std::uint64_t stopCurrentURL();
     void shutdown();
+
 
 signals:
     void sslErrors(QNetworkReply* reply, const QList<QSslError>& errors);

@@ -246,6 +246,18 @@ uint64_t HyDownloaderConnection::runReport(bool verbose)
     return post("/run_report", QJsonDocument{obj})->property("requestID").toULongLong();
 }
 
+uint64_t HyDownloaderConnection::stopCurrentSubscription()
+{
+    if(!m_enabled) return 0;
+    return post("/kill_current_sub", {})->property("requestID").toULongLong();
+}
+
+uint64_t HyDownloaderConnection::stopCurrentURL()
+{
+    if(!m_enabled) return 0;
+    return post("/kill_current_url", {})->property("requestID").toULongLong();
+}
+
 void HyDownloaderConnection::shutdown()
 {
     if(!m_enabled) return;
