@@ -376,11 +376,11 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         QJsonArray rowData;
         for(auto& index: indices) {
             index = subFilterModel->mapToSource(index);
-            auto row = subModel->getRowData(index);
+            auto row = subModel->getBasicRowData(index);
             row["paused"] = QJsonValue{0};
             rowData.append(row);
         }
-        subModel->setRowData(indices, rowData);
+        subModel->updateRowData(indices, rowData);
     });
     ui->pauseSubsButton->setMenu(pauseSubsMenu);
 
@@ -390,11 +390,11 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         QJsonArray rowData;
         for(auto& index: indices) {
             index = urlFilterModel->mapToSource(index);
-            auto row = urlModel->getRowData(index);
+            auto row = urlModel->getBasicRowData(index);
             row["paused"] = QJsonValue{0};
             rowData.append(row);
         }
-        urlModel->setRowData(indices, rowData);
+        urlModel->updateRowData(indices, rowData);
     });
     ui->pauseURLsButton->setMenu(pauseURLsMenu);
 
@@ -404,11 +404,11 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         QJsonArray rowData;
         for(auto& index: indices) {
             index = urlFilterModel->mapToSource(index);
-            auto row = urlModel->getRowData(index);
+            auto row = urlModel->getBasicRowData(index);
             row["archived"] = QJsonValue{0};
             rowData.append(row);
         }
-        urlModel->setRowData(indices, rowData);
+        urlModel->updateRowData(indices, rowData);
     });
     ui->archiveURLsButton->setMenu(archiveURLsMenu);
 
@@ -418,11 +418,11 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         QJsonArray rowData;
         for(auto& index: indices) {
             index = subCheckFilterModel->mapToSource(index);
-            auto row = subCheckModel->getRowData(index);
+            auto row = subCheckModel->getBasicRowData(index);
             row["archived"] = QJsonValue{0};
             rowData.append(row);
         }
-        subCheckModel->setRowData(indices, rowData);
+        subCheckModel->updateRowData(indices, rowData);
     });
     ui->archiveSubChecksButton->setMenu(archiveSubChecksMenu);
 
@@ -432,12 +432,12 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         QJsonArray rowData;
         for(auto& index: indices) {
             index = urlFilterModel->mapToSource(index);
-            auto row = urlModel->getRowData(index);
+            auto row = urlModel->getBasicRowData(index);
             row["status"] = QJsonValue{-1};
             row["overwrite_existing"] = QJsonValue{1};
             rowData.append(row);
         }
-        urlModel->setRowData(indices, rowData);
+        urlModel->updateRowData(indices, rowData);
     });
     ui->retryURLsButton->setMenu(retryURLsMenu);
 
@@ -811,12 +811,12 @@ void MainWindow::on_recheckSubsButton_clicked()
     QJsonArray rowData;
     for(auto& index: indices) {
         index = subFilterModel->mapToSource(index);
-        auto row = subModel->getRowData(index);
+        auto row = subModel->getBasicRowData(index);
         row["last_successful_check"] = QJsonValue::Null;
         row["last_check"] = QJsonValue::Null;
         rowData.append(row);
     }
-    subModel->setRowData(indices, rowData);
+    subModel->updateRowData(indices, rowData);
 }
 
 void MainWindow::on_pauseSubsButton_clicked()
@@ -825,11 +825,11 @@ void MainWindow::on_pauseSubsButton_clicked()
     QJsonArray rowData;
     for(auto& index: indices) {
         index = subFilterModel->mapToSource(index);
-        auto row = subModel->getRowData(index);
+        auto row = subModel->getBasicRowData(index);
         row["paused"] = QJsonValue{1};
         rowData.append(row);
     }
-    subModel->setRowData(indices, rowData);
+    subModel->updateRowData(indices, rowData);
 }
 
 void MainWindow::on_retryURLsButton_clicked()
@@ -838,11 +838,11 @@ void MainWindow::on_retryURLsButton_clicked()
     QJsonArray rowData;
     for(auto& index: indices) {
         index = urlFilterModel->mapToSource(index);
-        auto row = urlModel->getRowData(index);
+        auto row = urlModel->getBasicRowData(index);
         row["status"] = QJsonValue{-1};
         rowData.append(row);
     }
-    urlModel->setRowData(indices, rowData);
+    urlModel->updateRowData(indices, rowData);
 }
 
 void MainWindow::on_pauseURLsButton_clicked()
@@ -851,11 +851,11 @@ void MainWindow::on_pauseURLsButton_clicked()
     QJsonArray rowData;
     for(auto& index: indices) {
         index = urlFilterModel->mapToSource(index);
-        auto row = urlModel->getRowData(index);
+        auto row = urlModel->getBasicRowData(index);
         row["paused"] = QJsonValue{1};
         rowData.append(row);
     }
-    urlModel->setRowData(indices, rowData);
+    urlModel->updateRowData(indices, rowData);
 }
 
 void MainWindow::on_loadSubChecksForAllButton_clicked()
@@ -903,15 +903,15 @@ void MainWindow::on_includeArchivedURLsCheckBox_toggled(bool checked)
 
 void MainWindow::on_archiveURLsButton_clicked()
 {
-    auto indices = ui->subTableView->selectionModel()->selectedRows();
+    auto indices = ui->urlsTableView->selectionModel()->selectedRows();
     QJsonArray rowData;
     for(auto& index: indices) {
-        index = subFilterModel->mapToSource(index);
-        auto row = subModel->getRowData(index);
+        index = urlFilterModel->mapToSource(index);
+        auto row = urlModel->getBasicRowData(index);
         row["archived"] = QJsonValue{1};
         rowData.append(row);
     }
-    subModel->setRowData(indices, rowData);
+    urlModel->updateRowData(indices, rowData);
 }
 
 void MainWindow::on_archiveSubChecksButton_clicked()
@@ -920,11 +920,11 @@ void MainWindow::on_archiveSubChecksButton_clicked()
     QJsonArray rowData;
     for(auto& index: indices) {
         index = subCheckFilterModel->mapToSource(index);
-        auto row = subCheckModel->getRowData(index);
+        auto row = subCheckModel->getBasicRowData(index);
         row["archived"] = QJsonValue{1};
         rowData.append(row);
     }
-    subCheckModel->setRowData(indices, rowData);
+    subCheckModel->updateRowData(indices, rowData);
 }
 
 void MainWindow::on_loadStatusHistoryButton_clicked()

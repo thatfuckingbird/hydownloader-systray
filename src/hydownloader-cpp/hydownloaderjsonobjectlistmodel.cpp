@@ -108,14 +108,26 @@ QJsonObject HyDownloaderJSONObjectListModel::getRowData(const QModelIndex& rowIn
     return m_data[rowIndex.row()].toObject();
 }
 
-void HyDownloaderJSONObjectListModel::setRowData(const QVector<QModelIndex>& indices, const QJsonArray& objs)
+QJsonObject HyDownloaderJSONObjectListModel::getBasicRowData(const QModelIndex &rowIndex) const
+{
+    QJsonObject obj;
+    obj[m_idColumnName] = m_data[rowIndex.row()].toObject()[m_idColumnName];
+    return obj;
+}
+
+void HyDownloaderJSONObjectListModel::updateRowData(const QVector<QModelIndex>& indices, const QJsonArray& objs)
 {
     if(indices.size() != objs.size() || indices.isEmpty()) return;
     int minRow = std::numeric_limits<int>::max();
     int maxRow = 0;
     for(int i = 0; i < indices.size(); ++i) {
         const int row = indices[i].row();
-        m_data[row] = objs[i];
+        auto oldObject = m_data[row].toObject();
+        auto newObject = objs[i].toObject();
+        for(const auto& key : newObject.keys()) {
+            oldObject[key] = newObject[key];
+        }
+        m_data[row] = oldObject;
         if(row > maxRow) {
             maxRow = row;
         }
