@@ -173,9 +173,16 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     trayIcon->show();
     connect(trayIcon, &QSystemTrayIcon::activated, [&] {
         if(isVisible()) {
-            hide();
+            if(isMinimized()) {
+                setWindowState(windowState() & ~Qt::WindowMinimized | Qt::WindowActive);
+                activateWindow();
+                raise();
+            } else {
+                hide();
+            }
         } else {
             show();
+            activateWindow();
             raise();
         }
     });
