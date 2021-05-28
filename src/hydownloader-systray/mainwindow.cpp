@@ -754,7 +754,7 @@ Qt::GlobalColor MainWindow::statusToColor(const QString& statusText)
 {
     QString status = statusText.left(statusText.indexOf(':'));
     if(status == "paused") return Qt::yellow;
-    if(status == "no information") return Qt::gray;
+    if(status == "no information" || status == "shut down") return Qt::gray;
     if(status == "nothing to do") return Qt::green;
     if(status == "downloading URL" || status == "finished checking URL" || status == "checking subscription" || status == "finished checking subscription") return Qt::darkGreen;
     return Qt::red;
