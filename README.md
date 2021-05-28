@@ -32,6 +32,7 @@ Command line flags:
 * Color the rows of the log view according to severity
 * Add icon and desktop file
 * Add log rotation
+* Settable filter column
 
 ## License
 
