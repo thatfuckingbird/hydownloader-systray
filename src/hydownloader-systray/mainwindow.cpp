@@ -650,7 +650,9 @@ void MainWindow::on_loadDaemonLogButton_clicked()
 
 void MainWindow::on_copyLogToClipboardButton_clicked()
 {
-    logModel->copyToClipboard(ui->logTableView->selectionModel()->selectedRows());
+    auto rows = ui->logTableView->selectionModel()->selectedRows();
+    for(auto& index : rows) index = logFilterModel->mapToSource(index);
+    logModel->copyToClipboard(rows);
 }
 
 void MainWindow::on_subFilterLineEdit_textEdited(const QString& arg1)
