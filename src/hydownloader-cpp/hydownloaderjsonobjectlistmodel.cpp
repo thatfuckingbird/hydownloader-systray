@@ -108,7 +108,7 @@ QJsonObject HyDownloaderJSONObjectListModel::getRowData(const QModelIndex& rowIn
     return m_data[rowIndex.row()].toObject();
 }
 
-QJsonObject HyDownloaderJSONObjectListModel::getBasicRowData(const QModelIndex &rowIndex) const
+QJsonObject HyDownloaderJSONObjectListModel::getBasicRowData(const QModelIndex& rowIndex) const
 {
     QJsonObject obj;
     obj[m_idColumnName] = m_data[rowIndex.row()].toObject()[m_idColumnName];
@@ -124,7 +124,7 @@ void HyDownloaderJSONObjectListModel::updateRowData(const QVector<QModelIndex>& 
         const int row = indices[i].row();
         auto oldObject = m_data[row].toObject();
         auto newObject = objs[i].toObject();
-        for(const auto& key : newObject.keys()) {
+        for(const auto& key: newObject.keys()) {
             oldObject[key] = newObject[key];
         }
         m_data[row] = oldObject;

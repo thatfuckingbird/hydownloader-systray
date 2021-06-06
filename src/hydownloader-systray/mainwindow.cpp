@@ -651,7 +651,7 @@ void MainWindow::on_loadDaemonLogButton_clicked()
 void MainWindow::on_copyLogToClipboardButton_clicked()
 {
     auto rows = ui->logTableView->selectionModel()->selectedRows();
-    for(auto& index : rows) index = logFilterModel->mapToSource(index);
+    for(auto& index: rows) index = logFilterModel->mapToSource(index);
     logModel->copyToClipboard(rows);
 }
 
