@@ -4,16 +4,18 @@ Remote management GUI for hydownloader.
 
 ## What is this and how it works?
 
-This is a graphical applications to remotely manage a hydownloader instance.
+This is a graphical applications to remotely manage hydownloader instances.
 After setting the hydownloader API address and access key, this can be used to manage URLs, manage subscriptions,
-view logs or do basic maintenance actions.
+view subscription check history and logs or do basic maintenance actions.
+
+![Screenshot](screenshot.png)
 
 ## Installation instructions
 
 ### Windows
 
 You can download an up-to-date build from the releases page.
-Just extract the zip file, no installation needed (see below on how to launch it).
+Just extract the zip file, no installation needed (see below on how to configure and launch it).
 
 ### Linux and other platforms
 
@@ -44,9 +46,9 @@ A table of configuration keys and their explanations follows.
 | apiURL | A URL or a comma-separated list of URLs | URL(s) of your hydownloader instance(s). If using multiple instances, make sure to have as many URLs as access keys and instance names and that the URL and its corresponding access key is at the same position in the list. |
 | defaultTests | Comma-separated list of test names (see the help of `hydownloader-tools` and the hydownloader docs for info on testing). | These will be prefilled in the input box when starting tests from hydownloader-systray. |
 | defaultDownloaders | Comma-separated list of hydownloader subscription downloader names. | Items from this list will be offered when editing subscriptions in hydownloader-systray. The default value contains all sites supported by hydownloader, so it only makes sense to edit this if you want to remove some sites you don't use. |
-| defaultSubCheckInterval | Integer | Default subscription check interval in hours (prefilled when adding subscriptions). |
+| defaultSubCheckInterval | integer | Default subscription check interval in hours (prefilled when adding subscriptions). |
 | applyDarkPalette | true or false | Enable a basic dark theme. Might look incomplete on some systems. |
-| updateInterval | Integer | How often should hydownloader-systray query the hydownloader daemon for status and data updates. Value in milliseconds. The default value works well for a hydownloader daemon that runs on the same machine as hydownloader-systray. |
+| updateInterval | integer | How often should hydownloader-systray query the hydownloader daemon for status and data updates. Value in milliseconds. The default value works well for a hydownloader daemon that runs on the same machine as hydownloader-systray. |
 | startVisible | true or false | Whether hydownloader-systray should start with the main window visible or minimized to systray. |
 | aggressiveUpdates | true or false | If true, hydownloader-systray will not only query the hydownloader daemon for status updates (according to the `updateInterval`), but will also refresh the subscription, URL and subscription check lists. This leads to much more network traffic and load on the hydownloader daemon but also a much better user experience. If this is set to false, you will have to refresh the displayed data manually by clicking the refresh button. |
 | localConnection | true or false | Set this to true if hydownloader-systray is running on the same machine as hydownloader-daemon. This will enable some features that only make sense in this case, like opening download folders directly from hydownloader. |
@@ -82,7 +84,7 @@ The tray icon itself is a simulated 2x2 LED matrix where the colors correspond t
 The top row shows subscription downloader status, while the bottom row shows URL downloader status. The left side shows status information, while the right side is color-coded according to the number of items in the download/check queue.
 For example, the top right quarter of the tray icon is color-coded according to the number of subscriptions that are waiting to be checked.
 
-The URL/subscription worker statuses (the left side) has the following color coding:
+The URL/subscription worker statuses (the left side) have the following color coding:
 | Color | Meaning |
 |-------|---------|
 | (bright) green | OK, nothing to do |
