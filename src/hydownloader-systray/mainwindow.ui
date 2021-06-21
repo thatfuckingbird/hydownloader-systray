@@ -65,14 +65,21 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="urlsFilterLineEdit">
-          <property name="placeholderText">
-           <string>filter...</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QLineEdit" name="urlsFilterLineEdit">
+            <property name="placeholderText">
+             <string>filter...</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="urlsFilterColumnComboBox"/>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -214,14 +221,21 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="subFilterLineEdit">
-          <property name="placeholderText">
-           <string>filter...</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QLineEdit" name="subFilterLineEdit">
+            <property name="placeholderText">
+             <string>filter...</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="subFilterColumnComboBox"/>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -363,14 +377,21 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="subCheckFilterLineEdit">
-          <property name="placeholderText">
-           <string>filter...</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLineEdit" name="subCheckFilterLineEdit">
+            <property name="placeholderText">
+             <string>filter...</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="subCheckFilterColumnComboBox"/>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -489,14 +510,21 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="logFilterLineEdit">
-          <property name="placeholderText">
-           <string>filter...</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QLineEdit" name="logFilterLineEdit">
+            <property name="placeholderText">
+             <string>filter...</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="logFilterColumnComboBox"/>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">

@@ -332,6 +332,25 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     ui->subCheckTableView->setModel(subCheckFilterModel);
     ui->subCheckTableView->setItemDelegate(new JSONObjectDelegate{});
 
+    auto setupFilterColumnComboBox = [](QSortFilterProxyModel* model, QComboBox* comboBox)
+    {
+        comboBox->addItem("<any column>");
+        comboBox->setCurrentIndex(0);
+        auto columnCount = model->columnCount();
+        for(int i = 0; i < columnCount; ++i)
+        {
+            comboBox->addItem(model->headerData(i, Qt::Horizontal).toString());
+        }
+        connect(comboBox, &QComboBox::currentIndexChanged, [model](int index){
+            model->setFilterKeyColumn(index-1);
+        });
+    };
+
+    setupFilterColumnComboBox(logFilterModel, ui->logFilterColumnComboBox);
+    setupFilterColumnComboBox(subFilterModel, ui->subFilterColumnComboBox);
+    setupFilterColumnComboBox(urlFilterModel, ui->urlsFilterColumnComboBox);
+    setupFilterColumnComboBox(subCheckFilterModel, ui->subCheckFilterColumnComboBox);
+
     connect(logModel, &HyDownloaderLogModel::statusTextChanged, [&](const QString& statusText) {
         ui->currentLogLabel->setText(statusText);
     });
