@@ -2,7 +2,7 @@
 
 Remote management GUI for [hydownloader](https://github.com/thatfuckingbird/hydownloader).
 
-## What is this and how it works?
+## What is this and how does it work?
 
 This is a graphical applications to remotely manage [hydownloader](https://github.com/thatfuckingbird/hydownloader) instances.
 After setting the hydownloader API address and access key, this GUI can be used to manage URLs, manage subscriptions,
