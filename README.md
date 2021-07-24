@@ -1,11 +1,11 @@
 # hydownloader-systray
 
-Remote management GUI for hydownloader.
+Remote management GUI for [hydownloader](https://github.com/thatfuckingbird/hydownloader).
 
 ## What is this and how it works?
 
-This is a graphical applications to remotely manage hydownloader instances.
-After setting the hydownloader API address and access key, this can be used to manage URLs, manage subscriptions,
+This is a graphical applications to remotely manage [hydownloader](https://github.com/thatfuckingbird/hydownloader) instances.
+After setting the hydownloader API address and access key, this GUI can be used to manage URLs, manage subscriptions,
 view subscription check history and logs or do basic maintenance actions.
 
 ![Screenshot](screenshot.png)
@@ -32,6 +32,9 @@ make
 ```
 
 ## How to use
+
+This page only concerns the operation and features of hydownloader-systray itself.
+See the hydownloader documentation for explanation of the various actions and data displayed inside the program.
 
 ### Configuration
 
@@ -107,6 +110,7 @@ There is also a special case where the whole square is (bright) red, which means
 
 ## TODO
 
+* Mark "due" subs in the subscription list
 * Color the rows of the log view according to severity
 * Add icon and desktop file
 * Add log rotation
