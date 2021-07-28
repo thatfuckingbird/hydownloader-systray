@@ -362,7 +362,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
 
     setCurrentConnection(instanceNames[0]);
 
-    statusUpdateTimer->setInterval(settings->value("updateInterval").toInt());
+    statusUpdateTimer->setInterval(settings->value("updateInterval", 3000).toInt());
     statusUpdateTimer->start();
 
     statusUpdateIntervalTimer = new QTimer{this};
@@ -714,7 +714,7 @@ void MainWindow::on_addSubButton_clicked()
     if(!ok || downloader.isEmpty()) return;
     QString keywords = QInputDialog::getText(this, "Keywords", "Keywords:", QLineEdit::Normal, {}, &ok);
     if(!ok || keywords.isEmpty()) return;
-    int checkHours = QInputDialog::getInt(this, "Check interval", "Check interval in hours:", settings->value("defaultSubCheckInterval").toInt(), 1, 1000000, 1, &ok);
+    int checkHours = QInputDialog::getInt(this, "Check interval", "Check interval in hours:", settings->value("defaultSubCheckInterval", 48).toInt(), 1, 1000000, 1, &ok);
     if(!ok || checkHours <= 0) return;
 
     QJsonObject newSub;
