@@ -46,7 +46,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QJsonObject getRowData(const QModelIndex& rowIndex) const;
     QJsonObject getBasicRowData(const QModelIndex& rowIndex) const;
-    void updateRowData(const QVector<QModelIndex>& indices, const QJsonArray& objs);
+    void updateRowData(const QModelIndexList& indices, const QJsonArray& objs);
 
 private:
     QSet<std::uint64_t> m_updateIDs;

@@ -115,7 +115,7 @@ QJsonObject HyDownloaderJSONObjectListModel::getBasicRowData(const QModelIndex& 
     return obj;
 }
 
-void HyDownloaderJSONObjectListModel::updateRowData(const QVector<QModelIndex>& indices, const QJsonArray& objs)
+void HyDownloaderJSONObjectListModel::updateRowData(const QModelIndexList& indices, const QJsonArray& objs)
 {
     if(indices.size() != objs.size() || indices.isEmpty()) return;
     int minRow = std::numeric_limits<int>::max();

@@ -11,9 +11,13 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 COMPONENTS Widgets Gui Network REQUIRED)
+if(USE_QT5)
+    find_package(Qt5 COMPONENTS Widgets Gui Network REQUIRED)
+else()
+    find_package(Qt6 COMPONENTS Widgets Gui Network REQUIRED)
+endif()
 
-qt_add_executable(hydownloader-systray
+add_executable(hydownloader-systray
     src/hydownloader-systray/main.cpp
     src/hydownloader-systray/mainwindow.cpp
     src/hydownloader-systray/mainwindow.h
@@ -39,8 +43,14 @@ add_library(hydownloader
     src/hydownloader-cpp/hydownloadersubscriptionchecksmodel.h)
 
 target_include_directories(hydownloader-systray PRIVATE src/hydownloader-cpp)
-target_link_libraries(hydownloader PRIVATE Qt6::Core Qt6::Network Qt6::Gui)
-target_link_libraries(hydownloader-systray PRIVATE Qt6::Widgets Qt6::Network hydownloader)
+
+if(USE_QT5)
+    target_link_libraries(hydownloader PRIVATE Qt5::Core Qt5::Network Qt5::Gui)
+    target_link_libraries(hydownloader-systray PRIVATE Qt5::Widgets Qt5::Network hydownloader)
+else()
+    target_link_libraries(hydownloader PRIVATE Qt6::Core Qt6::Network Qt6::Gui)
+    target_link_libraries(hydownloader-systray PRIVATE Qt6::Widgets Qt6::Network hydownloader)
+endif()
 
 install(TARGETS hydownloader LIBRARY DESTINATION lib)
 install(TARGETS hydownloader-systray RUNTIME DESTINATION bin)

@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <cmath>
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QSettings>
@@ -341,7 +342,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         {
             comboBox->addItem(model->headerData(i, Qt::Horizontal).toString());
         }
-        connect(comboBox, &QComboBox::currentIndexChanged, [model](int index){
+        connect(comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [model](int index){
             model->setFilterKeyColumn(index-1);
         });
     };
