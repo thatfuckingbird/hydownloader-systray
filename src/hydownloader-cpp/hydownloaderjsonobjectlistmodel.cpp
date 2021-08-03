@@ -115,7 +115,7 @@ QJsonObject HyDownloaderJSONObjectListModel::getBasicRowData(const QModelIndex& 
     return obj;
 }
 
-void HyDownloaderJSONObjectListModel::updateRowData(const QModelIndexList& indices, const QJsonArray& objs)
+void HyDownloaderJSONObjectListModel::updateRowData(const QModelIndexList& indices, const QJsonArray& objs, bool removeRows)
 {
     if(indices.size() != objs.size() || indices.isEmpty()) return;
     int minRow = std::numeric_limits<int>::max();
@@ -137,6 +137,34 @@ void HyDownloaderJSONObjectListModel::updateRowData(const QModelIndexList& indic
     }
     m_updateIDs.insert(addOrUpdateObjects(objs));
     emit dataChanged(createIndex(minRow, 0), createIndex(maxRow, m_columnData.size() - 1));
+
+    if(removeRows) {
+        auto sortedIndices = indices;
+        std::sort(sortedIndices.begin(), sortedIndices.end(), [](const QModelIndex& a, const QModelIndex& b){
+            return a.row() < b.row();
+        });
+        std::vector<std::pair<int, int>> continuousRanges;
+        int start = sortedIndices[0].row(), end = sortedIndices[0].row();
+        for(int i = 1; i < sortedIndices.size(); ++i) {
+            if(sortedIndices[i-1].row()+1 == sortedIndices[i].row()) {
+                end = sortedIndices[i].row();
+            } else {
+                continuousRanges.push_back({start, end});
+                start = sortedIndices[i].row();
+                end = sortedIndices[i].row();
+            }
+        }
+        continuousRanges.push_back({start, end});
+        int alreadyRemoved = 0;
+        for(const auto& range : continuousRanges) {
+            beginRemoveRows({}, range.first, range.second);
+            for(int i = 0; i < end - start + 1; ++i) {
+                m_data.removeAt(start-alreadyRemoved);
+            }
+            alreadyRemoved += end - start + 1;
+            endRemoveRows();
+        }
+    }
 }
 
 void HyDownloaderJSONObjectListModel::handleReplyReceived(uint64_t requestID, const QJsonDocument&)

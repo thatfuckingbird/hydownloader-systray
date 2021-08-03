@@ -942,7 +942,8 @@ void MainWindow::on_archiveURLsButton_clicked()
         row["archived"] = QJsonValue{1};
         rowData.append(row);
     }
-    urlModel->updateRowData(indices, rowData);
+    urlModel->updateRowData(indices, rowData, !ui->includeArchivedURLsCheckBox->isChecked());
+    ui->urlsTableView->clearSelection();
 }
 
 void MainWindow::on_archiveSubChecksButton_clicked()
@@ -955,7 +956,8 @@ void MainWindow::on_archiveSubChecksButton_clicked()
         row["archived"] = QJsonValue{1};
         rowData.append(row);
     }
-    subCheckModel->updateRowData(indices, rowData);
+    subCheckModel->updateRowData(indices, rowData, !ui->includeArchivedSubChecksCheckBox->isChecked());
+    ui->subCheckTableView->clearSelection();
 }
 
 void MainWindow::on_loadStatusHistoryButton_clicked()
