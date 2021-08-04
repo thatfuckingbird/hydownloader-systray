@@ -34,10 +34,11 @@ HyDownloaderSingleURLQueueModel::HyDownloaderSingleURLQueueModel() :
        {"paused", "Paused", true, toBool, fromBool},
        {"metadata_only", "Metadata only", true, toBool, fromBool},
        {"overwrite_existing", "Overwrite existing", true, toBool, fromBool},
-       {"filter", "Filter", true, toVariant, &QJsonValue::fromVariant},
        {"max_files", "Max files", true, toVariant, &QJsonValue::fromVariant},
        {"new_files", "New files", false, toVariant, &QJsonValue::fromVariant},
        {"already_seen_files", "Already seen files", false, toVariant, &QJsonValue::fromVariant},
+       {"filter", "Filter", true, toVariant, &QJsonValue::fromVariant},
+       {"gallerydl_config", "gallery-dl config", true, toVariant, &QJsonValue::fromVariant},
        {"comment", "Comment", true, toVariant, &QJsonValue::fromVariant},
        {"archived", "Archived", true, toBool, fromBool}},
       "id"} {}

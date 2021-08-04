@@ -35,6 +35,7 @@ HyDownloaderSubscriptionModel::HyDownloaderSubscriptionModel() :
        {"additional_data", "Additional data", true, toVariant, &QJsonValue::fromVariant},
        {"time_created", "Time created", true, toDateTime, fromDateTime},
        {"filter", "Filter", true, toVariant, &QJsonValue::fromVariant},
+       {"gallerydl_config", "gallery-dl config", true, toVariant, &QJsonValue::fromVariant},
        {"comment", "Comment", true, toVariant, &QJsonValue::fromVariant}},
       "id"} {}
 
