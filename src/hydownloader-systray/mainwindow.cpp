@@ -710,18 +710,22 @@ void MainWindow::on_deleteSelectedSubsButton_clicked()
 void MainWindow::on_addSubButton_clicked()
 {
     bool ok = true;
+    const bool doNotAskCheckInterval = settings->value("doNotAskCheckInterval", false).toBool();
     QString downloader = QInputDialog::getItem(this, "Choose downloader", "Downloader:", settings->value("defaultDownloaders").toStringList(), 0, false, &ok);
     if(!ok || downloader.isEmpty()) return;
     QString keywords = QInputDialog::getText(this, "Keywords", "Keywords:", QLineEdit::Normal, {}, &ok);
     if(!ok || keywords.isEmpty()) return;
-    int checkHours = QInputDialog::getInt(this, "Check interval", "Check interval in hours:", settings->value("defaultSubCheckInterval", 48).toInt(), 1, 1000000, 1, &ok);
-    if(!ok || checkHours <= 0) return;
+    int checkHours = -1;
+    if(!doNotAskCheckInterval) {
+        checkHours = QInputDialog::getInt(this, "Check interval", "Check interval in hours:", settings->value("defaultSubCheckInterval", 48).toInt(), 1, 1000000, 1, &ok);
+        if(!ok || checkHours <= 0) return;
+    }
 
     QJsonObject newSub;
     newSub["keywords"] = keywords;
     newSub["downloader"] = downloader;
     newSub["paused"] = true;
-    newSub["check_interval"] = checkHours * 3600;
+    if(!doNotAskCheckInterval) newSub["check_interval"] = checkHours * 3600;
     QJsonArray arr = {newSub};
     currentConnection->addOrUpdateSubscriptions(arr);
     subModel->refresh();

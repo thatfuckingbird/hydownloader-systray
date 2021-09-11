@@ -55,6 +55,7 @@ A table of configuration keys and their explanations follows.
 | startVisible | true or false | Whether hydownloader-systray should start with the main window visible or minimized to systray. |
 | aggressiveUpdates | true or false | If true, hydownloader-systray will not only query the hydownloader daemon for status updates (according to the `updateInterval`), but will also refresh the subscription, URL and subscription check lists. This leads to much more network traffic and load on the hydownloader daemon but also a much better user experience. If this is set to false, you will have to refresh the displayed data manually by clicking the refresh button. |
 | localConnection | true or false | Set this to true if hydownloader-systray is running on the same machine as hydownloader-daemon. This will enable some features that only make sense in this case, like opening download folders directly from hydownloader. |
+| doNotAskCheckInterval | true or false | Skip asking for check interval when adding subscriptions. Only set this to true if you have set a default check interval in your hydownloader configuration, otherwise adding subscriptions will fail! |
 
 ### Launching hydownloader-systray
 
