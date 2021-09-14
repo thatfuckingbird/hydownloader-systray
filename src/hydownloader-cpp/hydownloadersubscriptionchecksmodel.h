@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "hydownloaderjsonobjectlistmodel.h"
+#include <optional>
 
 class HyDownloaderConnection;
 
@@ -36,7 +37,7 @@ public:
     void clear() override;
 
 public slots:
-    void loadDataForSubscription(int subscriptionID);
+    void loadDataForSubscriptions(const QVector<int>& subscriptionIDs = {});
     QString statusText() const;
     bool showArchived() const;
     void setShowArchived(bool show);
@@ -49,7 +50,7 @@ private slots:
     void handleSubscriptionChecksData(std::uint64_t requestID, const QJsonArray& data);
 
 private:
-    int m_lastRequestedID = 0;
+    std::optional<QVector<int>> m_lastRequestedIDs;
     QString m_statusText;
     bool m_showArchived = false;
 };

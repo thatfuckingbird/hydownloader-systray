@@ -47,8 +47,8 @@ std::uint64_t HyDownloaderSubscriptionChecksModel::addOrUpdateObjects(const QJso
 void HyDownloaderSubscriptionChecksModel::refresh(bool full)
 {
     if(full) clear();
-    if(m_lastRequestedID >= 0) {
-        m_connection->requestSubscriptionChecksData(m_lastRequestedID, m_showArchived);
+    if(m_lastRequestedIDs.has_value()) {
+        m_connection->requestSubscriptionChecksData(m_lastRequestedIDs.value(), m_showArchived);
         m_statusText = "Loading subscription check history...";
         emit statusTextChanged(m_statusText);
     }
@@ -61,9 +61,9 @@ void HyDownloaderSubscriptionChecksModel::clear()
     emit statusTextChanged(m_statusText);
 }
 
-void HyDownloaderSubscriptionChecksModel::loadDataForSubscription(int subscriptionID)
+void HyDownloaderSubscriptionChecksModel::loadDataForSubscriptions(const QVector<int>& subscriptionIDs)
 {
-    m_lastRequestedID = subscriptionID;
+    m_lastRequestedIDs = subscriptionIDs;
     refresh();
 }
 
@@ -87,8 +87,13 @@ void HyDownloaderSubscriptionChecksModel::setShowArchived(bool show)
 
 void HyDownloaderSubscriptionChecksModel::handleSubscriptionChecksData(uint64_t, const QJsonArray& data)
 {
-    if(m_lastRequestedID) {
-        m_statusText = QString{"Subscription check history for subscription %1"}.arg(m_lastRequestedID);
+    if(const auto& ids = m_lastRequestedIDs.value(); !ids.isEmpty()) {
+        const auto size = ids.size();
+        if(size == 1) {
+            m_statusText = QString{"Subscription check history for subscription %1"}.arg(ids[0]);
+        } else {
+            m_statusText = QString{"Subscription check history for %1 subscriptions"}.arg(size);
+        }
     } else {
         m_statusText = "Subscription check history for all subscriptions";
     }

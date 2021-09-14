@@ -140,11 +140,13 @@ uint64_t HyDownloaderConnection::requestSubscriptionData()
     return reply->property("requestID").toULongLong();
 }
 
-uint64_t HyDownloaderConnection::requestSubscriptionChecksData(int subscriptionID, bool showArchived)
+uint64_t HyDownloaderConnection::requestSubscriptionChecksData(const QVector<int>& subscriptionIDs, bool showArchived)
 {
     if(!m_enabled) return 0;
     QJsonObject obj;
-    obj["subscription_id"] = subscriptionID;
+    QJsonArray array;
+    for(const auto id: subscriptionIDs) array.push_back(id);
+    obj["ids"] = array;
     obj["archived"] = showArchived;
     auto reply = post("/get_subscription_checks", QJsonDocument{obj});
     reply->setProperty("requestType", QVariant::fromValue(RequestType::SubscriptionChecksData));

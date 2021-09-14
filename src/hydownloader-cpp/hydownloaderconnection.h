@@ -60,7 +60,7 @@ public slots:
     std::uint64_t requestStaticData(QString filePath);
     std::uint64_t requestStatusInformation();
     std::uint64_t requestSubscriptionData();
-    std::uint64_t requestSubscriptionChecksData(int subscriptionID = 0, bool showArchived = false);
+    std::uint64_t requestSubscriptionChecksData(const QVector<int>& subscriptionIDs = {}, bool showArchived = false);
     std::uint64_t requestSingleURLQueueData(bool showArchived = false);
     std::uint64_t requestAPIVersion();
     std::uint64_t deleteURLs(const QVector<int>& ids);

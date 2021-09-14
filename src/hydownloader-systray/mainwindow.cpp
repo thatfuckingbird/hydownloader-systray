@@ -478,10 +478,10 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         if(selectionSize == 0) return;
 
         QMenu popup;
+        if(selectionSize == 1) popup.addAction("View log", ui->viewLogForSubButton, &QToolButton::click);
+        popup.addAction("View check history", ui->viewChecksForSubButton, &QToolButton::click);
+        popup.addSeparator();
         if(selectionSize == 1) {
-            popup.addAction("View log", ui->viewLogForSubButton, &QToolButton::click);
-            popup.addAction("View check history", ui->viewChecksForSubButton, &QToolButton::click);
-            popup.addSeparator();
             auto subID = subModel->getIDs({subFilterModel->mapToSource(ui->subTableView->selectionModel()->selectedRows()[0])})[0];
             if(settings->value("localConnection").toBool()) {
                 popup.addAction("Open folder", [&, subID] {
@@ -589,7 +589,7 @@ void MainWindow::updateSubCountInfoAndButtons()
     ui->recheckSubsButton->setEnabled(selectionSize > 0);
     ui->deleteSelectedSubsButton->setEnabled(selectionSize > 0);
     ui->viewLogForSubButton->setEnabled(selectionSize == 1);
-    ui->viewChecksForSubButton->setEnabled(selectionSize == 1);
+    ui->viewChecksForSubButton->setEnabled(selectionSize > 0);
     ui->pauseSubsButton->setEnabled(selectionSize > 0);
     ui->subsLabel->setText(QString{"%1 selected, %2 total loaded subscriptions"}.arg(
       QLocale{}.toString(selectionSize),
@@ -895,13 +895,13 @@ void MainWindow::on_pauseURLsButton_clicked()
 
 void MainWindow::on_loadSubChecksForAllButton_clicked()
 {
-    subCheckModel->loadDataForSubscription(0);
+    subCheckModel->loadDataForSubscriptions();
 }
 
 void MainWindow::on_loadSubChecksForSubButton_clicked()
 {
     int id = QInputDialog::getInt(this, "Load check history for subscription", "Subscription ID:", 0, 0);
-    subCheckModel->loadDataForSubscription(id);
+    subCheckModel->loadDataForSubscriptions({id});
 }
 
 void MainWindow::on_refreshSubChecksButton_clicked()
@@ -919,8 +919,7 @@ void MainWindow::on_viewChecksForSubButton_clicked()
     auto indices = ui->subTableView->selectionModel()->selectedRows();
     for(auto& index: indices) index = subFilterModel->mapToSource(index);
     auto ids = subModel->getIDs(indices);
-    if(ids.size() != 1) return;
-    subCheckModel->loadDataForSubscription(ids[0]);
+    subCheckModel->loadDataForSubscriptions(ids);
     ui->mainTabWidget->setCurrentWidget(ui->subChecksTab);
 }
 
