@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QFile>
 #include <QTextStream>
 #include <cstdlib>
+#include <QMessageBox>
 
 int main(int argc, char* argv[])
 {
@@ -35,16 +36,14 @@ int main(int argc, char* argv[])
     p.addOption(startVisibleOpt);
     p.process(a);
 
-    QTextStream errout(stderr);
-
     QString filename = p.value(settingsOpt);
     if(filename.isEmpty()) {
         QString defaultSettingsFilename = QCoreApplication::applicationDirPath() + "/settings.ini";
-        errout << "No settings file specified, looking for one beside the executable." << Qt::endl;
+        QMessageBox::critical(nullptr, "hydownloader-systray", "No settings file specified, looking for one beside the executable.");
         if(QFile::exists(defaultSettingsFilename)) filename = defaultSettingsFilename;
     }
     if(!QFile::exists(filename)) {
-        errout << "Invalid or missing configuration file!" << Qt::endl;
+        QMessageBox::critical(nullptr, "hydownloader-systray", "Invalid or missing configuration file!");
         return EXIT_FAILURE;
     }
 
