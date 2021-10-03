@@ -39,7 +39,6 @@ int main(int argc, char* argv[])
     QString filename = p.value(settingsOpt);
     if(filename.isEmpty()) {
         QString defaultSettingsFilename = QCoreApplication::applicationDirPath() + "/settings.ini";
-        QMessageBox::critical(nullptr, "hydownloader-systray", "No settings file specified, looking for one beside the executable.");
         if(QFile::exists(defaultSettingsFilename)) filename = defaultSettingsFilename;
     }
     if(!QFile::exists(filename)) {
