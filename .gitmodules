@@ -1,0 +1,3 @@
+[submodule "src/hydownloader-cpp"]
+	path = src/hydownloader-cpp
+	url = https://github.com/thatfuckingbird/hydownloader-cpp.git
