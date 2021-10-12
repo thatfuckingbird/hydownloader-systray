@@ -5,16 +5,18 @@ jobs:
   build-windows:
     runs-on: [windows-latest]
     steps:
-      - 
+      -
         name: Checkout
         uses: actions/checkout@v2
-      - 
+        with:
+          submodules: 'true'
+      -
         name: Setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
           architecture: x64
-      - 
+      -
         name: Install Qt
         uses: jurplel/install-qt-action@v2
         with:
@@ -41,7 +43,7 @@ jobs:
           get-command libcrypto-1_1-x64.dll | % { copy-item -Path $_.Path -Destination '${{ github.workspace }}\release'}
           get-command libssl-1_1-x64.dll | % { copy-item -Path $_.Path -Destination '${{ github.workspace }}\release'}
           windeployqt --verbose 2 --release --compiler-runtime '${{ github.workspace }}\release\hydownloader-systray.exe'
-      - 
+      -
         name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -53,7 +55,7 @@ jobs:
         name: Generate Zip
         run: |
           7z a -tzip hydownloader-systray.zip '${{ github.workspace }}\release'
-      - 
+      -
         name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
