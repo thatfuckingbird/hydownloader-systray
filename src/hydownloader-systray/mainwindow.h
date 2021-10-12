@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <QMainWindow>
 #include <QTime>
-#include "hydownloaderlogmodel.h"
+#include <hydownloader-cpp/hydownloaderlogmodel.h>
 
 namespace Ui
 {

@@ -36,11 +36,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QFileInfo>
 #include <QDir>
 #include "jsonobjectdelegate.h"
-#include "hydownloaderconnection.h"
-#include "hydownloaderlogmodel.h"
-#include "hydownloadersubscriptionmodel.h"
-#include "hydownloadersingleurlqueuemodel.h"
-#include "hydownloadersubscriptionchecksmodel.h"
+#include <hydownloader-cpp/hydownloaderconnection.h>
+#include <hydownloader-cpp/hydownloaderlogmodel.h>
+#include <hydownloader-cpp/hydownloadersubscriptionmodel.h>
+#include <hydownloader-cpp/hydownloadersingleurlqueuemodel.h>
+#include <hydownloader-cpp/hydownloadersubscriptionchecksmodel.h>
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "addurlsdialog.h"
