@@ -1,5 +1,5 @@
 pkgname=hydownloader-systray-git
-pkgver=r8.29b02b2
+pkgver=r85.7da1535
 pkgrel=1
 pkgdesc="Remote management GUI for hydownloader."
 arch=('i686' 'x86_64')
@@ -17,6 +17,7 @@ pkgver() {
 
 build() {
   cd "$srcdir/$pkgname"
+  git submodule update --init
   cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release .
   make
 }
