@@ -35,9 +35,9 @@ add_executable(hydownloader-systray
 target_link_libraries(hydownloader-systray PRIVATE hydownloader-cpp::hydownloader-cpp)
 
 if(USE_QT5)
-    target_link_libraries(hydownloader-systray PRIVATE Qt5::Widgets Qt5::Network hydownloader)
+    target_link_libraries(hydownloader-systray PRIVATE Qt5::Widgets Qt5::Network)
 else()
-    target_link_libraries(hydownloader-systray PRIVATE Qt6::Widgets Qt6::Network hydownloader)
+    target_link_libraries(hydownloader-systray PRIVATE Qt6::Widgets Qt6::Network)
 endif()
 
 install(TARGETS hydownloader-systray RUNTIME DESTINATION bin)
