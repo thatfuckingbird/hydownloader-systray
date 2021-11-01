@@ -19,17 +19,21 @@ Just extract the zip file, no installation needed (see below on how to configure
 
 ### Linux and other platforms
 
-You will have to compile from source. For this, you will need cmake and Qt6 (and a C++ compiler).
+You will have to compile from source. For this, you will need cmake and Qt5/6 (and a C++ compiler).
 Arch (or Artix) Linux users can use the PKGBUILD included in this repository.
 
 Build commands after cloning this repo:
+
 ```
 cd hydownloader-systray
+git submodule update --init
 mkdir build
 cd build
 cmake ..
 make
 ```
+
+This will try to build with Qt6. Replace the cmake invocation with `cmake -DUSE_QT5 ..` if you want to build with Qt5.
 
 ## How to use
 
