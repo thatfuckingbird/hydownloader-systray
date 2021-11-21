@@ -38,6 +38,7 @@ class HyDownloaderConnection;
 class HyDownloaderLogModel;
 class HyDownloaderSingleURLQueueModel;
 class HyDownloaderSubscriptionChecksModel;
+class HyDownloaderMissedSubscriptionChecksModel;
 class HyDownloaderSubscriptionModel;
 class QSortFilterProxyModel;
 
@@ -53,6 +54,7 @@ private slots:
     void updateSubCountInfoAndButtons();
     void updateURLCountInfoAndButtons();
     void updateSubCheckCountInfoAndButtons();
+    void updateMissedSubCheckCountInfoAndButtons();
     void updateLogCountInfo();
     void setCurrentConnection(const QString& id);
 
@@ -81,13 +83,19 @@ private slots:
     void on_pauseURLsButton_clicked();
     void on_loadSubChecksForAllButton_clicked();
     void on_loadSubChecksForSubButton_clicked();
+    void on_loadMissedSubChecksForAllButton_clicked();
+    void on_loadMissedSubChecksForSubButton_clicked();
     void on_refreshSubChecksButton_clicked();
+    void on_refreshMissedSubChecksButton_clicked();
     void on_subCheckFilterLineEdit_textEdited(const QString& arg1);
+    void on_missedSubCheckFilterLineEdit_textEdited(const QString& arg1);
     void on_viewChecksForSubButton_clicked();
     void on_includeArchivedSubChecksCheckBox_toggled(bool checked);
+    void on_includeArchivedMissedSubChecksCheckBox_toggled(bool checked);
     void on_includeArchivedURLsCheckBox_toggled(bool checked);
     void on_archiveURLsButton_clicked();
     void on_archiveSubChecksButton_clicked();
+    void on_archiveMissedSubChecksButton_clicked();
     void on_loadStatusHistoryButton_clicked();
     void on_onlyLatestCheckBox_stateChanged(int arg1);
 
@@ -99,6 +107,7 @@ private:
     QAction* subscriptionsAction = nullptr;
     QAction* singleURLQueueAction = nullptr;
     QAction* checksAction = nullptr;
+    QAction* missedChecksAction = nullptr;
     QAction* logsAction = nullptr;
     QAction* quitAction = nullptr;
     QAction* pauseSubsAction = nullptr;
@@ -117,6 +126,7 @@ private:
     QAction* unarchiveSelectedURLsAction = nullptr;
     QAction* resumeSelectedSubsAction = nullptr;
     QAction* unarchiveSelectedSubChecksAction = nullptr;
+    QAction* unarchiveSelectedMissedSubChecksAction = nullptr;
     QAction* retryAndForceOverwriteURLAction = nullptr;
     QHash<QString, HyDownloaderConnection*> connections;
     HyDownloaderConnection* currentConnection = nullptr;
@@ -124,10 +134,12 @@ private:
     HyDownloaderSingleURLQueueModel* urlModel = nullptr;
     HyDownloaderSubscriptionModel* subModel = nullptr;
     HyDownloaderSubscriptionChecksModel* subCheckModel = nullptr;
+    HyDownloaderMissedSubscriptionChecksModel* missedSubCheckModel = nullptr;
     QSortFilterProxyModel* logFilterModel = nullptr;
     QSortFilterProxyModel* urlFilterModel = nullptr;
     QSortFilterProxyModel* subFilterModel = nullptr;
     QSortFilterProxyModel* subCheckFilterModel = nullptr;
+    QSortFilterProxyModel* missedSubCheckFilterModel = nullptr;
     void setIcon(const QIcon& icon);
     void launchAddURLsDialog(bool paused);
     QToolButton* menuButton = nullptr;

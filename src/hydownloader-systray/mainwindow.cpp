@@ -41,6 +41,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <hydownloader-cpp/hydownloadersubscriptionmodel.h>
 #include <hydownloader-cpp/hydownloadersingleurlqueuemodel.h>
 #include <hydownloader-cpp/hydownloadersubscriptionchecksmodel.h>
+#include <hydownloader-cpp/hydownloadermissedsubscriptionchecksmodel.h>
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "addurlsdialog.h"
@@ -153,6 +154,13 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     connect(checksAction, &QAction::triggered, [&] {
         ui->mainTabWidget->setCurrentWidget(ui->subChecksTab);
         if(settings->value("aggressiveUpdates").toBool()) subCheckModel->refresh(false);
+        show();
+        raise();
+    });
+    missedChecksAction = mainMenu->addAction("Review missed subscription checks");
+    connect(missedChecksAction, &QAction::triggered, [&] {
+        ui->mainTabWidget->setCurrentWidget(ui->missedSubChecksTab);
+        if(settings->value("aggressiveUpdates").toBool()) missedSubCheckModel->refresh(false);
         show();
         raise();
     });
@@ -295,12 +303,14 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     logModel = new HyDownloaderLogModel{};
     subModel = new HyDownloaderSubscriptionModel{};
     subCheckModel = new HyDownloaderSubscriptionChecksModel{};
+    missedSubCheckModel = new HyDownloaderMissedSubscriptionChecksModel{};
     urlModel = new HyDownloaderSingleURLQueueModel{};
     if(settings->value("aggressiveUpdates").toBool()) {
         connect(statusUpdateTimer, &QTimer::timeout, [&] {
             urlModel->refresh(false);
             subModel->refresh(false);
             subCheckModel->refresh(false);
+            missedSubCheckModel->refresh(false);
         });
     }
 
@@ -333,6 +343,12 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     ui->subCheckTableView->setModel(subCheckFilterModel);
     ui->subCheckTableView->setItemDelegate(new JSONObjectDelegate{});
 
+    missedSubCheckFilterModel = new QSortFilterProxyModel{};
+    missedSubCheckFilterModel->setSourceModel(missedSubCheckModel);
+    missedSubCheckFilterModel->setFilterKeyColumn(-1);
+    ui->missedSubCheckTableView->setModel(missedSubCheckFilterModel);
+    ui->missedSubCheckTableView->setItemDelegate(new JSONObjectDelegate{});
+
     auto setupFilterColumnComboBox = [](QSortFilterProxyModel* model, QComboBox* comboBox)
     {
         comboBox->addItem("<any column>");
@@ -351,6 +367,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     setupFilterColumnComboBox(subFilterModel, ui->subFilterColumnComboBox);
     setupFilterColumnComboBox(urlFilterModel, ui->urlsFilterColumnComboBox);
     setupFilterColumnComboBox(subCheckFilterModel, ui->subCheckFilterColumnComboBox);
+    setupFilterColumnComboBox(missedSubCheckFilterModel, ui->missedSubCheckFilterColumnComboBox);
 
     connect(logModel, &HyDownloaderLogModel::statusTextChanged, [&](const QString& statusText) {
         ui->currentLogLabel->setText(statusText);
@@ -358,6 +375,10 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
 
     connect(subCheckModel, &HyDownloaderSubscriptionChecksModel::statusTextChanged, [&](const QString& statusText) {
         ui->currentSubChecksLabel->setText(statusText);
+    });
+
+    connect(missedSubCheckModel, &HyDownloaderMissedSubscriptionChecksModel::statusTextChanged, [&](const QString& statusText) {
+        ui->currentMissedSubChecksLabel->setText(statusText);
     });
 
     setCurrentConnection(instanceNames[0]);
@@ -381,6 +402,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     connect(ui->subTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateSubCountInfoAndButtons);
     connect(ui->urlsTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateURLCountInfoAndButtons);
     connect(ui->subCheckTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateSubCheckCountInfoAndButtons);
+    connect(ui->missedSubCheckTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateMissedSubCheckCountInfoAndButtons);
     connect(ui->logTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateLogCountInfo);
 
     connect(logModel, &QAbstractItemModel::modelReset, this, &MainWindow::updateLogCountInfo);
@@ -398,6 +420,10 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     connect(subCheckModel, &QAbstractItemModel::modelReset, this, &MainWindow::updateSubCheckCountInfoAndButtons);
     connect(subCheckModel, &QAbstractItemModel::rowsInserted, this, &MainWindow::updateSubCheckCountInfoAndButtons);
     connect(subCheckModel, &QAbstractItemModel::rowsRemoved, this, &MainWindow::updateSubCheckCountInfoAndButtons);
+
+    connect(missedSubCheckModel, &QAbstractItemModel::modelReset, this, &MainWindow::updateMissedSubCheckCountInfoAndButtons);
+    connect(missedSubCheckModel, &QAbstractItemModel::rowsInserted, this, &MainWindow::updateMissedSubCheckCountInfoAndButtons);
+    connect(missedSubCheckModel, &QAbstractItemModel::rowsRemoved, this, &MainWindow::updateMissedSubCheckCountInfoAndButtons);
 
     QMenu* pauseSubsMenu = new QMenu{this};
     resumeSelectedSubsAction = pauseSubsMenu->addAction("Resume", [&] {
@@ -454,6 +480,20 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         subCheckModel->updateRowData(indices, rowData);
     });
     ui->archiveSubChecksButton->setMenu(archiveSubChecksMenu);
+
+    QMenu* archiveMissedSubChecksMenu = new QMenu{this};
+    unarchiveSelectedMissedSubChecksAction = archiveMissedSubChecksMenu->addAction("Unarchive", [&] {
+        auto indices = ui->missedSubCheckTableView->selectionModel()->selectedRows();
+        QJsonArray rowData;
+        for(auto& index: indices) {
+            index = missedSubCheckFilterModel->mapToSource(index);
+            auto row = missedSubCheckModel->getBasicRowData(index);
+            row["archived"] = QJsonValue{0};
+            rowData.append(row);
+        }
+        missedSubCheckModel->updateRowData(indices, rowData);
+    });
+    ui->archiveMissedSubChecksButton->setMenu(archiveMissedSubChecksMenu);
 
     QMenu* retryURLsMenu = new QMenu{this};
     retryAndForceOverwriteURLAction = retryURLsMenu->addAction("Retry and force overwrite", [&] {
@@ -547,6 +587,17 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     });
     ui->subCheckTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    connect(ui->missedSubCheckTableView, &QTableView::customContextMenuRequested, [&](const QPoint& pos) {
+        int selectionSize = ui->missedSubCheckTableView->selectionModel()->selectedRows().size();
+        if(selectionSize == 0) return;
+
+        QMenu popup;
+        popup.addAction("Archive", ui->archiveMissedSubChecksButton, &QToolButton::click);
+        popup.addAction("Unarchive", this->unarchiveSelectedMissedSubChecksAction, &QAction::trigger);
+        popup.exec(ui->missedSubCheckTableView->mapToGlobal(pos));
+    });
+    ui->missedSubCheckTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+
     if(settings->value("applyDarkPalette").toBool()) {
         QPalette darkPalette;
         darkPalette.setColor(QPalette::Window, QColor(0x47, 0x47, 0x47));
@@ -618,6 +669,15 @@ void MainWindow::updateSubCheckCountInfoAndButtons()
       QLocale{}.toString(subCheckModel->rowCount({}))));
 }
 
+void MainWindow::updateMissedSubCheckCountInfoAndButtons()
+{
+    const int selectionSize = ui->missedSubCheckTableView->selectionModel()->selectedRows().size();
+    ui->archiveMissedSubChecksButton->setEnabled(selectionSize > 0);
+    ui->missedSubChecksLabel->setText(QString{"%1 selected, %2 total loaded missed subscription checks"}.arg(
+      QLocale{}.toString(selectionSize),
+      QLocale{}.toString(missedSubCheckModel->rowCount({}))));
+}
+
 void MainWindow::updateLogCountInfo()
 {
     ui->logSelectionLabel->setText(QString{"%1 selected, %2 total loaded log entries"}.arg(
@@ -637,6 +697,7 @@ void MainWindow::setCurrentConnection(const QString& id)
     subModel->setConnection(currentConnection);
     subModel->refresh();
     subCheckModel->setConnection(currentConnection);
+    missedSubCheckModel->setConnection(currentConnection);
     urlModel->setConnection(currentConnection);
     urlModel->refresh();
 }
@@ -836,6 +897,7 @@ void MainWindow::showEvent(QShowEvent*)
         urlModel->refresh(false);
         subModel->refresh(false);
         subCheckModel->refresh(false);
+        missedSubCheckModel->refresh(false);
         logModel->refresh();
     }
 }
@@ -914,6 +976,27 @@ void MainWindow::on_subCheckFilterLineEdit_textEdited(const QString& arg1)
     subCheckFilterModel->setFilterRegularExpression(arg1);
 }
 
+void MainWindow::on_loadMissedSubChecksForAllButton_clicked()
+{
+    missedSubCheckModel->loadDataForSubscriptions();
+}
+
+void MainWindow::on_loadMissedSubChecksForSubButton_clicked()
+{
+    int id = QInputDialog::getInt(this, "Load missed checks for subscription", "Subscription ID:", 0, 0);
+    missedSubCheckModel->loadDataForSubscriptions({id});
+}
+
+void MainWindow::on_refreshMissedSubChecksButton_clicked()
+{
+    missedSubCheckModel->refresh();
+}
+
+void MainWindow::on_missedSubCheckFilterLineEdit_textEdited(const QString& arg1)
+{
+    missedSubCheckFilterModel->setFilterRegularExpression(arg1);
+}
+
 void MainWindow::on_viewChecksForSubButton_clicked()
 {
     auto indices = ui->subTableView->selectionModel()->selectedRows();
@@ -927,6 +1010,12 @@ void MainWindow::on_includeArchivedSubChecksCheckBox_toggled(bool checked)
 {
     subCheckModel->setShowArchived(checked);
     subCheckModel->refresh();
+}
+
+void MainWindow::on_includeArchivedMissedSubChecksCheckBox_toggled(bool checked)
+{
+    missedSubCheckModel->setShowArchived(checked);
+    missedSubCheckModel->refresh();
 }
 
 void MainWindow::on_includeArchivedURLsCheckBox_toggled(bool checked)
@@ -961,6 +1050,20 @@ void MainWindow::on_archiveSubChecksButton_clicked()
     }
     subCheckModel->updateRowData(indices, rowData, !ui->includeArchivedSubChecksCheckBox->isChecked());
     ui->subCheckTableView->clearSelection();
+}
+
+void MainWindow::on_archiveMissedSubChecksButton_clicked()
+{
+    auto indices = ui->missedSubCheckTableView->selectionModel()->selectedRows();
+    QJsonArray rowData;
+    for(auto& index: indices) {
+        index = missedSubCheckFilterModel->mapToSource(index);
+        auto row = missedSubCheckModel->getBasicRowData(index);
+        row["archived"] = QJsonValue{1};
+        rowData.append(row);
+    }
+    missedSubCheckModel->updateRowData(indices, rowData, !ui->includeArchivedMissedSubChecksCheckBox->isChecked());
+    ui->missedSubCheckTableView->clearSelection();
 }
 
 void MainWindow::on_loadStatusHistoryButton_clicked()
