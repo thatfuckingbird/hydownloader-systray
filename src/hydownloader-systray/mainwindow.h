@@ -152,4 +152,18 @@ private:
 protected:
     void closeEvent(QCloseEvent* event) override;
     void showEvent(QShowEvent* event) override;
+private slots:
+    void on_unloadLogButton_clicked();
+
+private slots:
+    void on_unloadMissedSubChecksButton_clicked();
+
+private slots:
+    void on_unloadSubChecksButton_clicked();
+
+private slots:
+    void on_unloadSubsButton_clicked();
+
+private slots:
+    void on_unloadURLsButton_clicked();
 };

@@ -35,7 +35,7 @@
     <item>
      <widget class="QTabWidget" name="mainTabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="singleURLsTab">
        <attribute name="title">
@@ -156,6 +156,13 @@
            <widget class="QToolButton" name="refreshURLsButton">
             <property name="text">
              <string>Refresh</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="unloadURLsButton">
+            <property name="text">
+             <string>Unload</string>
             </property>
            </widget>
           </item>
@@ -307,6 +314,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="unloadSubsButton">
+            <property name="text">
+             <string>Unload</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -429,6 +443,13 @@
            <widget class="QToolButton" name="refreshSubChecksButton">
             <property name="text">
              <string>Refresh</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="unloadSubChecksButton">
+            <property name="text">
+             <string>Unload</string>
             </property>
            </widget>
           </item>
@@ -562,6 +583,13 @@
            <widget class="QToolButton" name="refreshMissedSubChecksButton">
             <property name="text">
              <string>Refresh</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="unloadMissedSubChecksButton">
+            <property name="text">
+             <string>Unload</string>
             </property>
            </widget>
           </item>
@@ -700,6 +728,13 @@
            <widget class="QToolButton" name="copyLogToClipboardButton">
             <property name="text">
              <string>Copy to clipboard</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="unloadLogButton">
+            <property name="text">
+             <string>Unload</string>
             </property>
            </widget>
           </item>

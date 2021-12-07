@@ -1075,3 +1075,28 @@ void MainWindow::on_onlyLatestCheckBox_stateChanged(int arg1)
 {
     logModel->setShowOnlyLatest(arg1);
 }
+
+void MainWindow::on_unloadURLsButton_clicked()
+{
+    urlModel->clear(true);
+}
+
+void MainWindow::on_unloadSubsButton_clicked()
+{
+    subModel->clear(true);
+}
+
+void MainWindow::on_unloadSubChecksButton_clicked()
+{
+    subCheckModel->clear(true);
+}
+
+void MainWindow::on_unloadMissedSubChecksButton_clicked()
+{
+    missedSubCheckModel->clear(true);
+}
+
+void MainWindow::on_unloadLogButton_clicked()
+{
+    logModel->clear();
+}
