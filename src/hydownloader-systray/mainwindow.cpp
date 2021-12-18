@@ -43,7 +43,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <hydownloader-cpp/hydownloadersubscriptionchecksmodel.h>
 #include <hydownloader-cpp/hydownloadermissedsubscriptionchecksmodel.h>
 #include "mainwindow.h"
-#include "./ui_mainwindow.h"
+#include "ui_mainwindow.h"
 #include "addurlsdialog.h"
 
 QPixmap drawSystrayIcon(const QVector<Qt::GlobalColor>& data)
@@ -247,6 +247,13 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
             if(viewFolderURLReqs.contains(requestID)) {
                 viewFolderURLReqs.remove(requestID);
                 openFolder = true;
+            }
+            if(openURLReqs.contains(requestID)) {
+                const QString url = data.object()["url"].toString();
+                if(!url.isEmpty()) {
+                    QDesktopServices::openUrl(url);
+                }
+                openURLReqs.remove(requestID);
             }
             if(openFolder) {
                 QString finalDir;
@@ -522,13 +529,18 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
         popup.addAction("View check history", ui->viewChecksForSubButton, &QToolButton::click);
         popup.addSeparator();
         if(selectionSize == 1) {
-            auto subID = subModel->getIDs({subFilterModel->mapToSource(ui->subTableView->selectionModel()->selectedRows()[0])})[0];
+            const auto subID = subModel->getIDs({subFilterModel->mapToSource(ui->subTableView->selectionModel()->selectedRows()[0])})[0];
+            const auto downloader = subModel->getRowData(subFilterModel->mapToSource(ui->subTableView->selectionModel()->selectedRows()[0]))["downloader"].toString();
+            const auto keywords = subModel->getRowData(subFilterModel->mapToSource(ui->subTableView->selectionModel()->selectedRows()[0]))["keywords"].toString();
             if(settings->value("localConnection").toBool()) {
                 popup.addAction("Open folder", [&, subID] {
                     viewFolderSubReqs.insert(currentConnection->requestLastFilesForSubscriptions({subID}));
                 });
-                popup.addSeparator();
             }
+            popup.addAction("Open source URL in browser", [&, downloader, keywords] {
+                openURLReqs.insert(currentConnection->requestURLForSubscriptionData(downloader, keywords));
+            });
+            popup.addSeparator();
         }
 
         popup.addAction("Clear last checked time", ui->recheckSubsButton, &QToolButton::click);
