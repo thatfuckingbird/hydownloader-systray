@@ -21,7 +21,7 @@ endif()
 
 add_subdirectory(src/hydownloader-cpp)
 
-add_executable(hydownloader-systray
+add_executable(hydownloader-systray WIN32
     src/hydownloader-systray/main.cpp
     src/hydownloader-systray/mainwindow.cpp
     src/hydownloader-systray/mainwindow.h
