@@ -42,7 +42,7 @@ See the hydownloader documentation for explanation of the various actions and da
 
 ### Configuration
 
-The first step is to customize `settings.ini`.
+The first step is to customize `settings.ini`. Take the one in this repository as a starting point and modify it to your needs.
 At the very least, you should double check the values of `accessKey`, `apiURL`, `aggressiveUpdates` and `localConnection`.
 A table of configuration keys and their explanations follows.
 
