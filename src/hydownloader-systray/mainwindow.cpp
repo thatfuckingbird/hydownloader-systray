@@ -324,6 +324,7 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     logFilterModel = new QSortFilterProxyModel{};
     logFilterModel->setSourceModel(logModel);
     logFilterModel->setFilterKeyColumn(-1);
+    logFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->logTableView->setModel(logFilterModel);
     ui->logTableView->setItemDelegate(new JSONObjectDelegate{});
     connect(logModel, &QAbstractTableModel::rowsInserted, [&] {
@@ -333,12 +334,14 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     urlFilterModel = new QSortFilterProxyModel{};
     urlFilterModel->setSourceModel(urlModel);
     urlFilterModel->setFilterKeyColumn(-1);
+    urlFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->urlsTableView->setModel(urlFilterModel);
     ui->urlsTableView->setItemDelegate(new JSONObjectDelegate{});
 
     subFilterModel = new QSortFilterProxyModel{};
     subFilterModel->setSourceModel(subModel);
     subFilterModel->setFilterKeyColumn(-1);
+    subFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->subTableView->setModel(subFilterModel);
     auto subDelegate = new JSONObjectDelegate{};
     subDelegate->setItemListForColumn(1, settings->value("defaultDownloaders").toStringList());
@@ -347,12 +350,14 @@ MainWindow::MainWindow(const QString& settingsFile, bool startVisible, QWidget* 
     subCheckFilterModel = new QSortFilterProxyModel{};
     subCheckFilterModel->setSourceModel(subCheckModel);
     subCheckFilterModel->setFilterKeyColumn(-1);
+    subCheckFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->subCheckTableView->setModel(subCheckFilterModel);
     ui->subCheckTableView->setItemDelegate(new JSONObjectDelegate{});
 
     missedSubCheckFilterModel = new QSortFilterProxyModel{};
     missedSubCheckFilterModel->setSourceModel(missedSubCheckModel);
     missedSubCheckFilterModel->setFilterKeyColumn(-1);
+    missedSubCheckFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->missedSubCheckTableView->setModel(missedSubCheckFilterModel);
     ui->missedSubCheckTableView->setItemDelegate(new JSONObjectDelegate{});
 
@@ -717,6 +722,7 @@ void MainWindow::setCurrentConnection(const QString& id)
 void MainWindow::on_logFilterLineEdit_textEdited(const QString& arg1)
 {
     logFilterModel->setFilterRegularExpression(arg1);
+    logFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 }
 
 void MainWindow::on_refreshLogButton_clicked()
@@ -751,6 +757,7 @@ void MainWindow::on_copyLogToClipboardButton_clicked()
 void MainWindow::on_subFilterLineEdit_textEdited(const QString& arg1)
 {
     subFilterModel->setFilterRegularExpression(arg1);
+    subFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 }
 
 void MainWindow::on_viewLogForSubButton_clicked()
@@ -807,6 +814,7 @@ void MainWindow::on_addSubButton_clicked()
 void MainWindow::on_urlsFilterLineEdit_textEdited(const QString& arg1)
 {
     urlFilterModel->setFilterRegularExpression(arg1);
+    urlFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 }
 
 void MainWindow::on_viewLogForURLButton_clicked()
@@ -986,6 +994,7 @@ void MainWindow::on_refreshSubChecksButton_clicked()
 void MainWindow::on_subCheckFilterLineEdit_textEdited(const QString& arg1)
 {
     subCheckFilterModel->setFilterRegularExpression(arg1);
+    subCheckFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 }
 
 void MainWindow::on_loadMissedSubChecksForAllButton_clicked()
@@ -1007,6 +1016,7 @@ void MainWindow::on_refreshMissedSubChecksButton_clicked()
 void MainWindow::on_missedSubCheckFilterLineEdit_textEdited(const QString& arg1)
 {
     missedSubCheckFilterModel->setFilterRegularExpression(arg1);
+    missedSubCheckFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 }
 
 void MainWindow::on_viewChecksForSubButton_clicked()
